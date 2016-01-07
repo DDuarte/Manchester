@@ -1,0 +1,8 @@
+docs/thesis/*.aux
+docs/thesis/*.bbl
+docs/thesis/*.blg
+docs/thesis/*.log
+docs/thesis/*.lot
+docs/thesis/*.lof
+docs/thesis/*.out
+docs/thesis/*.toc
