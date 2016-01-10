@@ -1,13 +1,15 @@
 before_install:
-- sudo apt-get update && sudo apt-get install --no-install-recommends texlive-fonts-recommended
-  texlive-latex-extra texlive-fonts-extra texlive-latex-recommended dvipng
+- curl -L https://raw.githubusercontent.com/krlmlr/texlive-squashfs/master/out/texlive.tar.xz | tar xJC ~
+
+install:
+- PATH=$HOME/texlive/bin/x86_64-linux:$PATH
 
 script:
 - mkdir _build
-- pdflatex -output-directory _build -aux-directory docs/thesis/ docs/thesis/mieic-en
-- bibtex   -output-directory _build -aux-directory docs/thesis/ docs/thesis/mieic-en
-- pdflatex -output-directory _build -aux-directory docs/thesis/ docs/thesis/mieic-en
-- pdflatex -output-directory _build -aux-directory docs/thesis/ docs/thesis/mieic-en
+- pdflatex -output-directory _build docs/thesis/mieic-en
+- bibtex   -output-directory _build docs/thesis/mieic-en
+- pdflatex -output-directory _build docs/thesis/mieic-en
+- pdflatex -output-directory _build docs/thesis/mieic-en
 
 deploy:
   provider: releases
