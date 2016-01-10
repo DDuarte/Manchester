@@ -1,0 +1,34 @@
+sudo: false
+cache: apt
+addons:
+  apt:
+    packages:
+    - texlive-latex-recommended
+    - texlive-latex-extra
+    - texlive-fonts-recommended
+    - texlive-fonts-extra
+script:
+- cd docs/thesis && make
+before_deploy:
+- git config --global user.email "builds@travis-ci.com"
+- git config --global user.name "Travis CI"
+- export GIT_TAG=build-$TRAVIS_BRANCH-$(date -u "+%Y-%m-%d")-$TRAVIS_BUILD_NUMBER
+- git tag $GIT_TAG -a -m "Generated tag from TravisCI for build $TRAVIS_BUILD_NUMBER"
+- git push -q https://$TAGPERM@github.com/DDuarte/Manchester --tags
+- ls -R
+deploy:
+  provider: releases
+  api_key:
+    secure: Sx2p4czfnxSSaf4tR5puv1Hwjrr/1/G29w93E+ZVJIX8SS59PGZEbVPl3YeV+85keLUwS6c6cG2T2Ox70VTnGvKRFAFRqUsbkw1K3netnGIEl5SU9vNj4+Cuu/QXAKHFSMJYqXX1c8gnWH3YF4eDXeOcrkPEAQIShC7+T52orW0gPWd2uvZgXZCmWlz//S9p6IOV5/qBR0Im3rWU60prY+daxJm4dvVIN5I9ddV+/9Nq0tDyAtzLfiJcyUvYILCH87fP/3rk7GYTo1gz0sLheh2yLEJYDkWl1aj4JTYaHqi2aEF4p/bMToG9cJOoXt0pYzMkzNxG4fXBGXN1umJuY2zdkaEsnXczHJBQfZjc8R0RdItRn84QNcXiRYM8rIP20x+vRMLLanj82vGJph9F9loKyVa57TwdpN+o1+Io32GsVQNO4uL0ed14wG77/iBWNdhGYCj1z5uAxglS8Sc5ZSLAi6U3VIeEeqTBJ8xF2ZnBmaiss3YcyvfC1FYL+g0bwtXM9z0V6tL/EJkLvLjTgeuccdUErC8yXLB5DzYY3CPr3cjG2uv4FtE7cDWfkkHPzrswHK9iFnCKkpwPZf3wlCfAH+O6k+xjYbiRYjKeYHFj67RWTlHdq94patfX7iRxG8JeBXHzRRvOjl+QRBv6AXMYmHywi3OaWXsmJLmVcIU=
+  file: mieic-en.pdf
+  skip_cleanup: true
+  on:
+    repo: DDuarte/Manchester
+    all_branches: true
+    tags: false
+branches:
+  except:
+  - /^build-[0-9a-z\-]*/
+env:
+  global:
+    secure: jeGE+be8COJ96sHB8yoZyd9JQTRZhz2mzIv2IzZQdzkA1XV/M3999ROqeHe12k7oqP2kQ1PdTqgCj7PS8xenQmzG5QCWoW4SVz2QZmcVv9zZAcW7Am7PazCvylXofVlHbtYGFtfWXx9il1tt2AD0yxXKfQPPrm4kUoFjUrU7D4P0+ypXOZBUMwgNvXV49BRTvlqkl6IuWyy6D9Gi6/7VhwEDDPDNa/2bFfTz0HOIcUGFG0CotUqbOJiaQ1jguQEZJ9+JjEF70YQ3sJ3o1vuIIzevejXWPvniq2loePweDuduLRtdd0VgmVE5qjr5b+1RbIzbyu539TrqH6KdhR5MLHEMLvAxnpg7UIN+bompk6acFSJAkWkBev7Of2ok9najENv4dE2BJwILFPgLKTSOIvTxkNvNfiWZxUqLQQULaFPFkUPCeb71YqOM8+l//egMttfQOCpuOGXRm4HWBTdUf+VgyQ6wTVLT+8YItv91RNzAJ5PJe5WxG/57MmDE86WVL3ior29m5ZH2rJZJyvFClFfLp9HY5dsRV2OckhfDN5h+8QT9iaez4LSfZGLpOGxTK/t0HgD8mp/iH354RDCN9SszQ+Qxa8kZ8cYx51/tqlQjBQcb2l38Az3KcR1KJ5pAHR1WNTq3xKhT7yBKsPT0EpIh9QouLARNG7qbqwBhvEM=
