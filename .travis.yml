@@ -6,10 +6,10 @@ install:
 
 script:
 - cd docs/thesis && mkdir _build
-- cd docs/thesis && pdflatex -output-directory _build mieic-en
-- cd docs/thesis && bibtex   -output-directory _build mieic-en
-- cd docs/thesis && pdflatex -output-directory _build mieic-en
-- cd docs/thesis && pdflatex -output-directory _build mieic-en
+- pdflatex -output-directory _build mieic-en
+- bibtex   -output-directory _build mieic-en
+- pdflatex -output-directory _build mieic-en
+- pdflatex -output-directory _build mieic-en
 
 deploy:
   provider: releases
