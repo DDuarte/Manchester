@@ -1,3 +1,5 @@
+language: r
+
 before_install:
 - curl -L https://raw.githubusercontent.com/krlmlr/texlive-squashfs/master/out/texlive.tar.xz | tar xJC ~
 
