@@ -1,5 +1,7 @@
 sudo: false
 
+cache: apt
+
 addons:
   apt:
     packages:
@@ -19,3 +21,4 @@ deploy:
   skip_cleanup: true
   on:
     repo: DDuarte/Manchester
+    all_branches: true
