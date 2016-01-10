@@ -6,3 +6,5 @@ docs/thesis/*.lot
 docs/thesis/*.lof
 docs/thesis/*.out
 docs/thesis/*.toc
+docs/thesis/*.pdf
+docs/thesis/*.synctex.gz
