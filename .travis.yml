@@ -1,7 +1,12 @@
-sudo: required
+sudo: false
 
-install:
-- sudo apt-get install texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended
+addons:
+  apt:
+    packages:
+    - texlive-latex-recommended
+    - texlive-latex-extra
+    - texlive-fonts-recommended
+    - texlive-fonts-extra
 
 script:
 - cd docs/thesis && make
