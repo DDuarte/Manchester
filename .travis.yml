@@ -1,10 +1,11 @@
 language: r
+sudo: required
 
-before_install:
-- curl -L https://raw.githubusercontent.com/krlmlr/texlive-squashfs/master/out/texlive.tar.xz | tar xJC ~
-
-install:
-- PATH=$HOME/texlive/bin/x86_64-linux:$PATH
+# before_install:
+# - curl -L https://raw.githubusercontent.com/krlmlr/texlive-squashfs/master/out/texlive.tar.xz | tar xJC ~
+# 
+# install:
+# - PATH=$HOME/texlive/bin/x86_64-linux:$PATH
 
 script:
 - cd docs/thesis && mkdir _build
