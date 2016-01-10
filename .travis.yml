@@ -6,10 +6,10 @@ install:
 
 script:
 - mkdir _build
-- pdflatex -output-directory _build -aux-directory docs/thesis docs/thesis/mieic-en
-- bibtex   -output-directory _build -aux-directory docs/thesis docs/thesis/mieic-en
-- pdflatex -output-directory _build -aux-directory docs/thesis docs/thesis/mieic-en
-- pdflatex -output-directory _build -aux-directory docs/thesis docs/thesis/mieic-en
+- pdflatex -output-directory _build -aux_directory docs/thesis docs/thesis/mieic-en
+- bibtex   -output-directory _build -aux_directory docs/thesis docs/thesis/mieic-en
+- pdflatex -output-directory _build -aux_directory docs/thesis docs/thesis/mieic-en
+- pdflatex -output-directory _build -aux_directory docs/thesis docs/thesis/mieic-en
 
 deploy:
   provider: releases
