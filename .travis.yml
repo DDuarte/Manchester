@@ -6,16 +6,13 @@ install:
 
 script:
 - cd docs/thesis && mkdir _build
-- pdflatex -output-directory _build mieic-en
-- bibtex   -output-directory _build mieic-en
-- pdflatex -output-directory _build mieic-en
-- pdflatex -output-directory _build mieic-en
+- make
 
 deploy:
   provider: releases
   api_key:
     secure: Sx2p4czfnxSSaf4tR5puv1Hwjrr/1/G29w93E+ZVJIX8SS59PGZEbVPl3YeV+85keLUwS6c6cG2T2Ox70VTnGvKRFAFRqUsbkw1K3netnGIEl5SU9vNj4+Cuu/QXAKHFSMJYqXX1c8gnWH3YF4eDXeOcrkPEAQIShC7+T52orW0gPWd2uvZgXZCmWlz//S9p6IOV5/qBR0Im3rWU60prY+daxJm4dvVIN5I9ddV+/9Nq0tDyAtzLfiJcyUvYILCH87fP/3rk7GYTo1gz0sLheh2yLEJYDkWl1aj4JTYaHqi2aEF4p/bMToG9cJOoXt0pYzMkzNxG4fXBGXN1umJuY2zdkaEsnXczHJBQfZjc8R0RdItRn84QNcXiRYM8rIP20x+vRMLLanj82vGJph9F9loKyVa57TwdpN+o1+Io32GsVQNO4uL0ed14wG77/iBWNdhGYCj1z5uAxglS8Sc5ZSLAi6U3VIeEeqTBJ8xF2ZnBmaiss3YcyvfC1FYL+g0bwtXM9z0V6tL/EJkLvLjTgeuccdUErC8yXLB5DzYY3CPr3cjG2uv4FtE7cDWfkkHPzrswHK9iFnCKkpwPZf3wlCfAH+O6k+xjYbiRYjKeYHFj67RWTlHdq94patfX7iRxG8JeBXHzRRvOjl+QRBv6AXMYmHywi3OaWXsmJLmVcIU=
-  file: docs/thesis/_build/mieic-en.pdf
+  file: docs/thesis/_build/pdis-en.pdf
   skip_cleanup: true
   on:
     repo: DDuarte/Manchester
