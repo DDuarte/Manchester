@@ -15,6 +15,24 @@
 
 \section{Future Work}
 
-
 \section{SWOT Analysis}
 
+\begin{tikzpicture}[
+any/.style={draw,minimum width=3cm,minimum height=3cm,%
+	text width=2.5cm,align=center,outer sep=0pt},
+header/.style={any,minimum height=1cm,fill=black!10},
+leftcol/.style={header,rotate=90}
+]
+
+\matrix (SWOT) [matrix of nodes,nodes={any,anchor=center},%
+column sep=-\pgflinewidth,%
+row sep=-\pgflinewidth,%
+row 1/.style={nodes=header},%
+column 1/.style={nodes=leftcol},
+inner sep=0pt]
+{
+	& {\texta} & {\textb} \\
+	{\textcn} & Strengths & Weakness \\
+	{\textdn} & Opportunities & Threats \\
+};
+\end{tikzpicture}
