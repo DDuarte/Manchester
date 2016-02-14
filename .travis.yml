@@ -8,6 +8,7 @@ addons:
     - texlive-fonts-recommended
     - texlive-fonts-extra
     - texlive-pictures
+    - texlive-latex3
     - pgf
 script:
 - cd docs/thesis && make
