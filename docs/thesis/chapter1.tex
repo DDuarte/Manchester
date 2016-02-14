@@ -2,36 +2,14 @@
 
 \section*{}
 
+In this chapter we intend to introduce the report, starting by describing its context, motivations and objectives that will drive the dissertation. It ends with a description of the report structure.
+
 %% O primeiro capítulo da dissertação deve servir para apresentar o
 %% enquadramento e a moti\-va\-ção do trabalho e para identificar e
 %% definir os problemas que a dissertação aborda.
 %% Deve resumir as metodologias utilizadas no trabalho e termina
 %% apresentando um breve resumo de cada um dos capítulos
 %% posteriores.
-%% 
-%% Este documento ilustra o formato a usar em dissertações na \Feup, não
-%% servindo de exemplo sobre os conteúdos a usar.
-%% São dados exemplos de margens, cabeçalhos, títulos, paginação, estilos
-%% de índices, etc. 
-%% São ainda dados exemplos de formatação de citações, figuras e tabelas,
-%% equações, referências cruzadas, lista de referências e índices.
-%% 
-%% Uma recolha de normas existentes sobre este assunto pode ser
-%% encontrada em~\cite{kn:Mat93}. 
-%% 
-%% \begin{quote}
-%%   ``Like the Abstract, the Introduction should be written to engage the
-%%   interest of the reader. It should also give the reader an idea of
-%%   how the dissertation is structured, and in doing so, define the
-%%   thread of the contents.''~\cite[chap.\ Introduction]{kn:Tha01} 
-%% \end{quote}
-%% 
-%% Neste primeiro capítulo ilustra-se a utilização de citações e de
-%% referências biblio\-grá\-fi\-cas.
-%% Para além de dar um exemplo de utilização de uma citação, a citação
-%% anterior, introduz uma referência que pode ser consultada, entre
-%% muitas outras referências bibliográficas
-%% interessantes~\cite{kn:Tha01,kn:PP05}. 
 
 \section{Context} \label{sec:context}
  
@@ -40,21 +18,35 @@
 %% descrição da empresa onde o trabalho decorreu.
 %% 
 
+Customers interact with e-commerce websites in multiple ways and the companies
+operating them rely on optimizing success metrics such as CTR (Click
+through Rate), CPC (Cost per Conversion), Basket and Lifetime Value and User
+Engagement for profit. Changing what, how and when content such as product
+recommendations and ads are displayed can influence customers’ actions.
+
+Multiple algorithms and techniques in data mining and machine learning
+have been applied in this context. 
+
+% TODO Equal to the summary, extend me
+
 \section{Motivation and Goals} \label{sec:goals}
 
-%% Apresenta a motivação e enumera os objetivos do trabalho terminando
-%% com um resumo das metodologias para a prossecução dos objetivos.
+Summarizing and analyzing user behaviour can be expensive and tricky since it’s hard to extrapolate patterns that never occurred before and the causality aspects of the system are not usually taken into consideration. Commonly used online techniques such as A/B testing and multi-armed bandit optimization have the down side of having a high operational cost (including time e.g if a data scientist is evaluating the impact of a new recommendation engine after one month, she would need to wait an actual month to have results). However, there has been studies about characterizing user behaviour and interactions in e-commerce websites that could be used to improve this process.
+
+The goal of this dissertation is to create a framework capable of running a
+multi-agent simulation, by regarding users in an e-commerce website and react
+to stimuli that influence their actions. Furthermore, some statistical constructs such as Baysian networks, Markov chains or probability distributions can be used to guide how these agents interact with the system. By taking input from web mining (Web structure mining (WSM), Web usage mining (WUM) and
+Web content mining (WCM)), which includes both static and dynamic content
+of websites as well as user personas, the simulation should collect success metrics so that the experimentation being run can be evaluated. For example, this framework could be used to try different approaches to product recommendation and estimate the impact of it.
+
+% TODO Equal to the summary, extend me
 
 \section{Report Structure} \label{sec:struct}
 
-%% Para além da introdução, esta dissertação contém mais x capítulos.
-%% No capítulo~\ref{chap:sota}, é descrito o estado da arte e são
-%% apresentados trabalhos relacionados. 
-%% %\todoline{Complete the document structure.}
-%% No capítulo~\ref{chap:chap3}, ipsum dolor sit amet, consectetuer
-%% adipiscing elit.
-%% No capítulo~\ref{chap:chap4} praesent sit amet sem. 
-%% No capítulo~\ref{chap:concl}  posuere, ante non tristique
-%% consectetuer, dui elit scelerisque augue, eu vehicula nibh nisi ac
-%% est. 
-%% 
+Besides this introduction, this report has 5 more chapters.
+
+In chapters \ref{chap:ecommerce}, \ref{chap:simulation} and \ref{chap:models}, we describe the literature review and state of the art in regard to e-commerce, simulation systems and probabilistic models, respectively. The chapter \ref{chap:ecommerce} focuses on e-commerce background, what metrics can be used on e-commerce websites and the customer life cycle, an important part in the simulation. The chapter \ref{chap:simulation} describes three main topics regarding simulating systems: agent based, discrete event simulation and systems dynamics. Finally, the chapter \ref{chap:models} deals with describing some probabilistic models, with emphasis on graphical models and Bayesian statistics.
+
+Chapter \ref{chap:method} is concerned with describing the problem at hand in detail and the methodology that will be used for the dissertation.
+
+The final chapter, chapter \ref{chap:conclusion}, concludes the work realized, describes a SWOT\footnote{Strengths, weaknesses, opportunities and threats} analysis applied to the project and proposes a work plan for the dissertation.
