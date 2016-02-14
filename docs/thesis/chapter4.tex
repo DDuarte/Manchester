@@ -115,8 +115,109 @@ navigational clickstream data.
 
 \section{Markov Random Fields}
 
+Markov random fields (MRF) or Markov networks are undirected graphical models 
+\cite{Kindermann1980} (in contrast to Bayesian networks which are directed and 
+acyclic). The nodes still represent variables or group of variables however the 
+links do not carry arrows. The concept was originally proposed as the general 
+setting for the Ising model\footnote{Ising model: mathematical model of 
+ferromagnetism in statistical mechanics}~\cite{Kindermann1980}. Again, 
+Bishop~\cite{bishop2006pattern} provides a very good overview of this topic. 
+
+MRFs factorize as
+
+\begin{equation}
+p(x_{1}, ..., x_{n}) = \frac{1}{Z} \prod_{C \subset \mathfrak{C}}^{} 
+\psi_{C}(x_{C}) \label{eq:markov_factor}
+\end{equation}
+
+where $ C $ is a clique\footnote{clique: fully connected subset of vertices} of 
+the graph and $ x_{C} $ is the set of variables in that clique, $ Z $ is a 
+constant used to normalize the distribution (might be defined for each $ x $), 
+$ \psi_{C} $ is a compatibility or potential function~\cite[section 
+2.1.2]{Wainwright2008} \cite[section 8.3]{bishop2006pattern}. The equation 
+\ref{eq:markov_factor} highlights an important property of MRFs: the Markov 
+property or memoryless property. That is, the conditional probability 
+distribution of future states depends only on the present state. 
+
+Markov models were shown to be well suited for modelling and predicting 
+e-commerce purchasing and user's browsing behaviour \cite{Deshpande2001}. The 
+same article states ``there will be cases in which a user’s Web site
+browsing process is not Markovian and, in these cases, such an assumption will
+lead to inaccurate modeling'' however this claim is groundless.
+
 \section{Hidden Markov Models}
 
-\cite{Rabiner1989}
+Hidden Markov models (HMMs) are a PGM with unobserved or hidden states. They 
+are considered a dynamic Bayesian network\footnote{dynamic Bayesian network: 
+Bayesian networks adapted with time steps}. They have been originally defined 
+in the 60s by Baum and colleagues \cite{Baum1966}. \cite{Rabiner1989} defines 
+HMMs as ``the resulting model (...) is a doubly embeded stochastic process that 
+is not observable, but can only be observed though another set of stochastic 
+processes that produce the sequence of observations.''.
+
+A common example found in literature is the Coin Toss Model~\cite{Rabiner1989}: 
+imagine someone on one side of a curtain performing a coin (or multiple coin) 
+tossing experiment. The other person will not tell us about what she is doing, 
+only the outcome of each coin flip (heads or tails). Multiple HMMs can be built 
+to explain the coin toss outcomes, i.e, assuming that one, two or more biased 
+coins are being used in the experiment. The figure \ref{fig:hmm_coins} is a 
+possible model that can account to 3 coins being tossed.
+
+\begin{figure}[t]
+    \begin{center}
+        \leavevmode
+        \includegraphics[width=0.56\textwidth]{hmm_coins}
+        \caption{Example of a 3-coin model \cite{Rabiner1989}}
+        \label{fig:hmm_coins}
+    \end{center}
+\end{figure}
+
+A HMM is characterized by the following:
+\begin{itemize}
+    \item $ N $ which is the number of states in the model where individual 
+    states are represented by $ S = \{ S_{1}, ..., S_{N} \} $ and the state at 
+    time $ t $ is $ q_{t} $;
+    \item $ M $ which is the number of distinct observation symbols per state 
+    (individual symbols are represented by $ V = \{V_{1}, ..., V_{M} \} $);
+    \item $ A = \{ a_{i, j} \} $, the state transition probability 
+    distribution where
+    \begin{equation}
+    a_{ij} = p(q_{t+1} = S_{j} \mid q_{t} = S_{i}), 1 \leq i, j \leq N
+    \end{equation}
+    \item $ B = \{ b_{j}(k) \} $, the observation symbol probability 
+    distribution in state $ j $:
+    \begin{equation}
+    b_{j}(k) = p(v_{k}~at \mid q_{t} = S_{j}), 1 \leq j \leq N, 1 \leq k 
+    \leq M
+    \end{equation}
+    \item Finally, $ \pi = \{ \pi_{i} \} $, the initial state distribution:
+    \begin{equation}
+    \pi_{i} = p(q_{1} = S_{i}), 1 \leq i \leq N
+    \end{equation}
+\end{itemize}
+
+The formal model can be summarized as $ \lambda = (A, B, \pi) 
+$~\cite{Rabiner1989}.
+
+Multiple algorithms have been studied and applied to HMMs: for inference, the 
+forward algorithm, forward-backward algorithm \cite{baum1967inequality} or the 
+Viterbi algorithm \cite{forney2005viterbi, martin2000speech}. Regarding 
+learning, the algorithm Baum-Welch \cite{Baum1966, baum1967inequality} can be 
+used.
+
+Regarding e-commerce and web user behaviour there is some research done. 
+\cite{Xie2009}~explains how to use a hidden semi-Markov model to detect 
+anomalies on user browsing behaviour. \cite{Anderson2002}~describes very 
+briefly a relational hidden Markov model for the behaviour of web site users, 
+in order to improve predictions and personalization of websites.
 
 \section{Summary}
+
+In this section we reviewed the literature for graphical models. They provide a 
+tool of excellence to model real world phenomena, enabling decision making 
+under uncertainty and noisy observations.
+
+There are multiple categories of graphical models however we focused on 
+Bayesian and Markov networks and hidden Markov models, due to their 
+applicability in the work at hand (in chapter \ref{chap:method} we will define 
+how PGMs can be applied).
