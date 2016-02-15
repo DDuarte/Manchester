@@ -57,18 +57,81 @@ regarding simulating user behaviour in websites with agents.
 
 \section{Discrete Event Simulation (DES)}
 
+A discrete event simulation (DES) models a process as a series of discrete 
+events, where the state of the system changes only at well defined points in 
+time \cite{Siebers2010}. It was originally proposed by Kiviat in 1969 
+\cite{Kiviat1969} and there is extensive research in this simulation technique. 
+Banks et al. \cite{Banks2004} provides a comprehensive description and analysis 
+of DES. The algorithm \ref{alg:des} is a possible implementation of a very 
+simple and single-threaded DES.
 
+\begin{algorithm}[h]
+    \caption{Basic DES algorithm}
+    \label{alg:des}
+    %later in the document
+    \begin{algorithmic}
+        \State $EndCondition \gets false$
+        \State $Clock \gets 0$
+        \State $EventList \gets initialEvent$
+        \While{$EndCondition = false$}
+        \State $CurrentEvent \gets \Call{Pop}{EventList}$
+        \State $Clock \gets \Call{Time}{CurrentEvent}$
+        \State $\Call{Execute}{CurrentEvent}$ \Comment{might put new 
+            events in $EventList$}
+        \State $\Call{UpdateStatistics}$
+        \EndWhile
+        \State $\Call{GenerateReport}$
+    \end{algorithmic}
+\end{algorithm}
 
-\cite{Siebers2010}
+The major concepts in DES are as follows \cite{Banks2004}:
+
+\begin{itemize}
+    \item Entity, objects explicitly represented in the model (e.g, a customer);
+    \item Event, an occurrence that changes the state of the system (e.g, a  
+    customer enters the website);
+    \item Event list (or future event list or pending event set), a list of 
+    future events, ordered by time of occurrence;
+    \item Clock, used to keep track of the current simulation time.
+\end{itemize}
+
+Event list is one of the fundamental parts of the system and it has been widely 
+researched \cite{Henriksen1986, Jones1986, Tan2000, Dickman2013}.
+
+Pidd \cite{pidd1998computer} proposes a three-phased approach that consists of: 
+jump to the next chronological event, executing all the unconditional events 
+(or type B) that happen that moment and then executing all the conditional 
+events (or type C). This approach has advantages in terms of less usage of 
+resources compared to other simplistic approaches. Also, there has 
+been studies on how to scale DES to distributed and parallel (PDES)
+executions~\cite{Misra1986, Fujimoto1990}.
+
+\cite{SiebersDES2010} states that ``DES is useful for problems (...) in which 
+the processes can be well defined and their emphasis is on representing 
+uncertainty through stochastic distributions'', which makes DES a good 
+candidate to model the problem at hand.
 
 \section{Hybrid and novel approaches}
 
-\cite{Kurve2013}
-
-\cite{Brailsford2014}
-
-\cite{FonsecaiCasas2011}
-
-\cite{Onggo2007}
+In recent years, there has been research which proposes a marriage between 
+agent based model and simulation with discrete event simulation, however, this 
+concept is not widely recognized \cite{Brailsford2014}. Brailsford states that 
+the line that divides agent based models (and simulation) and DES is spurious 
+and that common distinctions between the two approaches are artificial. Casas 
+et al. \cite{FonsecaiCasas2011} describe a method where multi agent system 
+components have been added to an existing discrete event simulation implemented 
+in OMNeT++\footnote{C++ based discrete event simulation 
+toolkit}\cite{Varga2001}. Onggo \cite{Onggo2007} shows how agent based models 
+can be ran on top of a DES engine. Kurve et al.~\cite{Kurve2013} describes an 
+agent based performance model of a PDES kernel. Regarding existing software, 
+AnyLogic claims to be ``the only simulation tool that supports Discrete Event, 
+Agent Based, and System Dynamics Simulation''~\cite{AnyLogic2000}. AnyLogic was 
+first shown in 2000 at the Winter Simulation Conference.
 
 \section{Summary}
+
+This literature reviews shows that there is vast research regarding simulation, 
+either agent based or DES, however not everyone is speaking the same language. 
+The extensions to DES seen above are particularly interesting since they can be 
+used to scale the simulation to a greater number of entities as well as 
+modelling real world processes with more fidelity.
