@@ -2,18 +2,73 @@
 
 \section*{}
 
+This chapter intends to introduce some approaches to computational simulation 
+systems and engines, namely agent based and discrete event simulation. To 
+finish the chapter, we show some novel approaches to simulation.
+
 \section{Introduction}
+
+Simulations are used to reproduce the behaviour of a system. They have been 
+applied to different areas like physics, weather, biology, economics and many 
+others. There are many types of simulations: stochastic or deterministic, 
+steady-state or dynamic, continuous or discrete and local or distributed 
+\cite{WKSimulation}. These categories are not exhaustive nor exclusive.
+
+In this literature review, we are particularly interested in studying 
+simulations which can model stochastic processes and not dynamic (dynamic 
+systems are usually described by differential equations and are continuous).
 
 \section{Agent Based Simulation (ABS)}
 
-\cite{Siebers2010}
+In agent based simulation (ABS), sometimes described as agent based computing 
+\cite{wooldridge1998agent, jennings1999agent}, the individual entities in the 
+model are represented discretely and maintain a set of behaviours, beliefs or 
+rules that determine how their state is updated. \cite{Niazi2011} lists three 
+different approaches to agent based modelling and simulation:
+
+\begin{itemize}
+    \item \emph{Agent-oriented programming} which puts emphasis on developing 
+    complex individual agents rather than a large set of agents;
+    \item \emph{Multi-agent oriented programming} focus on adding \emph{some} 
+    intelligence to agents and observe their interactions;
+    \item \emph{Agent-based or massively multi-agent modelling} where the main 
+    idea is to build simple models for the agents which interact with a large 
+    population of other agents to observe the global behaviour.
+\end{itemize}
+
+\cite{Siebers2010} describes ABS as ``well suited to modelling systems with 
+heterogeneous, autonomous and pro-active actors, such as human-centred 
+systems.'', which make them a good candidate to be used in the development of 
+this dissertation. However, existing literature is quite confusing and broad, 
+using different terms to refer to the same concepts, without clear 
+distinctions between different agent based approaches and without consensus 
+\cite{Niazi2011, Brailsford2014}.
+
+Many platforms and frameworks were developed to support agent-based modelling 
+and similation. Some notable examples include Repast~\cite{collier2003repast}, 
+NetLogo~\cite{wilensky1999netlogo}, StarLogo~\cite{resnick1996starlogo} or 
+MASON~\cite{panait2005cooperative}. An updated list is maintained at OpenABM 
+\cite{OpenABM2016}.
+
+Agents have been applied to e-commerce context mostly in two distinct areas: 
+recommendation systems \cite{xiao2007commerce, walter2008model} and negotiation 
+\cite{rahwan2002intelligent, maes1999agents}. No relevant literature was found 
+regarding simulating user behaviour in websites with agents.
 
 \section{Discrete Event Simulation (DES)}
 
-\cite{Siebers2010}
 
-\section{System Dynamics (SD)}
 
 \cite{Siebers2010}
+
+\section{Hybrid and novel approaches}
+
+\cite{Kurve2013}
+
+\cite{Brailsford2014}
+
+\cite{FonsecaiCasas2011}
+
+\cite{Onggo2007}
 
 \section{Summary}
