@@ -407,3 +407,11 @@ a.sidebar-nav-item:focus {
   background:#7d7d7d;
 }
 
+.middle {
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.text-middle {
+  text-align: center;
+}

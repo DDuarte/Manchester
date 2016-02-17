@@ -16,6 +16,8 @@ author:
   name:           'Duarte Duarte'
   url:            https://github.com/DDuarte
 
+paginate:         5
+
 # Custom vars
 version:          1.0.0
 
