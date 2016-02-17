@@ -1,0 +1,23 @@
+# Dependencies
+markdown:         redcarpet
+gems: [jekyll-paginate]
+
+# Permalinks
+permalink:        pretty
+
+# Setup
+title:            Manchester
+tagline:          Framework for Multi-Agent Simulation of User Behaviour in E-Commerce Sites
+description:      Dissertation
+url:              http://dduarte.github.io/manchester
+baseurl:          /
+
+author:
+  name:           'Duarte Duarte'
+  url:            https://github.com/DDuarte
+
+# Custom vars
+version:          1.0.0
+
+github:
+  repo:           https://github.com/DDuarte/Manchester
