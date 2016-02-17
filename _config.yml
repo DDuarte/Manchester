@@ -8,8 +8,8 @@ permalink:        pretty
 title:            Manchester
 tagline:          Framework for Multi-Agent Simulation of User Behaviour in E-Commerce Sites
 description:      Dissertation
-url:              http://dduarte.github.io/manchester
-baseurl:          /
+url:              http://dduarte.github.io/Manchester
+baseurl:          /Manchester/
 
 author:
   name:           'Duarte Duarte'
