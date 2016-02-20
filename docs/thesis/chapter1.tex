@@ -24,38 +24,45 @@ Customers interact with e-commerce websites in multiple ways and the companies
 operating them rely on optimizing success metrics such as CTR (Click
 through Rate), CPC (Cost per Conversion), Basket and Lifetime Value and User
 Engagement for profit. Changing what, how and when content such as product
-recommendations and ads are displayed can influence customers’ actions.
+recommendations and ads are displayed can influence customers' actions.
 
 Multiple algorithms and techniques in data mining and machine learning
 have been applied in this context.
 
-TODO Equal to the summary, extend me
-
 \section{Motivation and Goals} \label{sec:goals}
 
-Summarizing and analyzing user behaviour can be expensive and tricky since it’s 
-hard to extrapolate patterns that never occurred before and the causality 
-aspects of the system are not usually taken into consideration. Commonly used 
-online techniques such as A/B testing and multi-armed bandit optimization have 
-the down side of having a high operational cost (including time e.g if a data 
-scientist is evaluating the impact of a new recommendation engine after one 
-month, she would need to wait an actual month to have results). However, there 
-has been studies about characterizing user behaviour and interactions in 
-e-commerce websites that could be used to improve this process.
+Modelling user behaviour on the web is not a new problem. It has been applied 
+with different objectives, from improving the performance of cache 
+servers, to the improvement of search engine, influencing purchase patters or 
+recommending related pages or products~\cite{Deshpande2001, 
+JSrivastavaRCooley2000}. However, all these approaches were done with a machine 
+learning mindset -- \textit{predicting} which page the user or customer will 
+browse next. This requires extensive use of existing and historical training 
+datasets which might not expose all the causality aspects of the system. What 
+if the data (or the time needed to gather it) is simply not available?
+
+Let's imagine that we developed a new recommendation engine algorithm. One of 
+the most common ways to evaluate it is by testing the engine with \textit{A/B 
+testing\footnote{formally, two-sample hypothesis testing}}, which is a 
+randomized experiment where a group of users are presented with one version of 
+the engine (control) and the other group is shown the improved version of the 
+engine. By analysing how the two groups behave differently, it's possible to 
+assess the quality of the two versions, comparatively. However, this approach 
+may not be feasible in all situations. For the experiment to be statistically 
+significant, the number of users shown the two versions of the product must be 
+enough. The experiment also takes time to run and the metrics used to compare 
+both versions might not be easy to choose. \cite{Quora2015}.
 
 The goal of this dissertation is to create a framework capable of running a
-multi-agent simulation, by regarding users in an e-commerce website and react
-to stimuli that influence their actions. Furthermore, some statistical 
-constructs such as Baysian networks, Markov chains or probability distributions 
-can be used to guide how these agents interact with the system. By taking input 
-from web mining (Web structure mining (WSM), Web usage mining (WUM) and
-Web content mining (WCM)), which includes both static and dynamic content
-of websites as well as user personas, the simulation should collect success 
-metrics so that the experimentation being run can be evaluated. For example, 
-this framework could be used to try different approaches to product 
-recommendation and estimate the impact of it.
-
-TODO Equal to the summary, extend me
+multi-agent simulation (chapter \ref{chap:simulation}), by regarding users in 
+an e-commerce website and react to stimuli that influence their actions 
+(chapter \ref{chap:ecommerce}). Furthermore, some statistical constructs such 
+as Baysian networks, Markov chains or probability distributions (chapter 
+\ref{chap:models}) can be used to guide how these agents interact with the 
+system. By taking input from web mining (Web structure mining (WSM), Web usage 
+mining (WUM) and Web content mining (WCM)), which includes both static and 
+dynamic content of websites as well as user personas, the simulation should 
+collect success metrics so that the experimentation being run can be evaluated.
 
 \section{Report Structure} \label{sec:struct}
 
@@ -67,14 +74,14 @@ simulation systems and probabilistic models, respectively. The chapter
 \ref{chap:ecommerce} focuses on e-commerce background, what metrics can be used 
 on e-commerce websites and the customer life cycle, an important part in the 
 simulation. The chapter \ref{chap:simulation} describes three main topics 
-regarding simulating systems: agent based, discrete event simulation and 
-systems dynamics. Finally, the chapter \ref{chap:models} deals with describing 
+regarding simulating systems: agent based, discrete event simulation and some 
+hybrid approaches. Finally, the chapter \ref{chap:models} deals with describing 
 some probabilistic models, with emphasis on graphical models and Bayesian 
 statistics.
 
-Chapter \ref{chap:method} is concerned with describing the problem at hand in 
-detail and the methodology that will be used for the dissertation.
+Chapter \ref{chap:method} is concerned with describing the methodology and 
+proposes a work plan for the dissertation.
 
-The final chapter, chapter \ref{chap:conclusion}, concludes the work realized, 
-describes a SWOT\footnote{Strengths, weaknesses, opportunities and threats} 
-analysis applied to the project and proposes a work plan for the dissertation.
+The final chapter, chapter \ref{chap:conclusion}, concludes the work realized 
+and describes a SWOT\footnote{Strengths, weaknesses, opportunities and threats} 
+analysis applied to the project.
