@@ -62,7 +62,7 @@ or attrition.
     conversion.
     \item Retention focuses on making existing customers, that made at least 
     one purchase before, repeat purchases.
-    \item Loyalty is a strong form of retention, which represents a greater 
+    \item Loyalty is a stronger form of retention, which represents a greater 
     trust level of the customer in the store.
     \item Abandonment is defined by the customers that started the buying 
     process but do not finish it. For example, a customer may add items to the 
@@ -79,21 +79,133 @@ or attrition.
 
 \section{Customer Behavior Model Graph (CBMG)}
 
+A state transition graph named Customer Behavior Model Graph (CBMG) can be used 
+to describe the behaviour of customers browsing a website. The nodes represent 
+the possible states or pages, e.g home page, product page, search, and a 
+probability is associated with each transition. An example of such a CBMG is 
+shown in figure \ref{fig:cbmg}.
 
+\begin{figure}[h]
+    \begin{center}
+        \leavevmode
+        \includegraphics[width=0.86\textwidth]{cbmg}
+        \caption{Example of a customer behaviour model graph \cite{Menasce1999}}
+        \label{fig:cbmg}
+    \end{center}
+\end{figure}
+
+\cite{Menasce1999} describes how CBMGs can be used to analyse the workload of 
+an e-commerce store server and how metrics can be derived directly from the 
+CBMG alone.
 
 \section{E-commerce metrics}
 
-\cite{Sterne2000}
+Metrics are a common way to quantify, measure, benchmark or evaluate some 
+process. In an e-commerce setting, businesses are interested in optimizing, 
+mostly, for profit. Different businesses prioritize metrics in different ways, 
+adapted to each use case. Here we present some common used metrics, but this 
+list is by no means exhaustive. \cite{Sterne2000, Menasce1999}
+
+\begin{itemize}
+    \item \textit{Conversion Rate} (CR) is the percentage of visitors that buy 
+    a product or a service;
+    \item \textit{Shopping Cart Abandonment} is the percentage of visitors that 
+    added a product to the online cart but did not complete the process;
+    \item \textit{Average Order Value} (AOV) is the average size of an order;
+    \item \textit{Customer Lifetime Value} (LTV) is the projected value that a 
+    customer will spend on the store;
+    \item \textit{Clicks to Buy} (CTB) is the average number of clicks a 
+    visitor has to do to complete a buy order;
+    \item \textit{Churn Rate} the percentage of customers that do not make a 
+    repeated purchase;
+    \item \textit{Bounce Rate} is the percentage of visitors that arrive at the 
+    homepage of the online store but leave immediately, without clicking 
+    anything or visiting a different page.
+\end{itemize}
+
+There are other common metrics such as \textit{Acquisition Cost}, \textit{Cost 
+Per Conversion}, \textit{Net Yield} or \textit{Connection Rate} however they 
+are associated with promotion campaigns that happen outside of the store 
+website, therefore they are not interesting in the context of our work.
 
 \section{Influencing user behaviour}
 
--> influenciar behaviour em vez de recom
+Tracking a bunch of statistics and metrics about an online store is no good if 
+there are no actionable changes that can be done using that information. 
+\cite{Constantinides2004} describes functionality, psychological and content 
+factors that can influence the visitor experience, represented in the table 
+\ref{tab:factors}.
 
-\subsection{Recommendation engines}
+\begin{table}[h]
+    \centering
+    \caption{Main building blocks of Web experience and their sub-categories 
+    \cite{Constantinides2004}}
+\label{tab:factors}
+\begin{tabular}{lll}
+    \cline{1-2}
+    \multicolumn{2}{|c|}{\textbf{Functionality 
+    factors}}                                               & 
+    \textbf{}                                   \\ \cline{1-2}
+    \multicolumn{1}{|l|}{\textbf{Usability}}             & 
+    \multicolumn{1}{l|}{\textbf{Interactivity}} & 
+    \textbf{}                                   \\ \cline{1-2}
+    Convenience                                          & Customer 
+    service/after sales                
+    &                                             \\
+    Site navigation                                      & Interaction with 
+    company personnel          &                                             \\
+    Information architecture                             & 
+    Customization                               &                               
+                  \\
+    Ordering/payment process                             & Network 
+    effects                             &                                       
+          \\
+    Search facilities and process                        
+    &                                             &                             
+                    \\
+    Site speed                                           
+    &                                             &                             
+                    \\
+    Findability/accessibility                            
+    &                                             &                             
+                    \\
+    &                                             
+    &                                             \\ \hline
+    \multicolumn{1}{|l|}{\textbf{Psychological factors}} & 
+    \multicolumn{2}{c|}{\textbf{Content 
+    factors}}                                             \\ \hline
+    \multicolumn{1}{|l|}{\textbf{Trust}}                 & 
+    \multicolumn{1}{l|}{\textbf{Aesthetics}}    & 
+    \multicolumn{1}{l|}{\textbf{Marketing mix}} \\ \hline
+    Transaction security                                 & 
+    Design                                      & 
+    Communication                               \\
+    Customer data misuse                                 & Presentation 
+    quality                        & 
+    Product                                     \\
+    Customer data safety                                 & Design 
+    elements                             & 
+    Fulfillment                                 \\
+    Uncertainty reducing elements                        & 
+    Style/atmosphere                            & 
+    Price                                       \\
+    Guarantees/return policies                           
+    &                                             & 
+    Promotion                                   \\
+    &                                             & 
+    Characteristics                            
+\end{tabular}
+\end{table}
 
-\cite{Adomavicius2005}
+Regarding usability of the online store, providing a personalized experience to 
+each customer can be very beneficial for both the customer and the business. A 
+common way to do this is by recommending products that the customer might be 
+interested it \cite{Adomavicius2005}. For example, if we know that a customer 
+buys mostly football related products, recommending her more products in the 
+same category might increase sales.
 
 \section{Summary}
 
-No final do capítulo deverá ser apresentado um resumo com as 
-principais conclusões que se podem tirar. 
+In this chapter we covered a brief overview of e-commerce, starting with the 
+customer lifecycle, how to measure it using metrics and presenting a common way 
+to model the users' behaviour, the CBMG.
