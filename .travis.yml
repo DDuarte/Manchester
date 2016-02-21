@@ -9,6 +9,7 @@ addons:
     - texlive-fonts-extra
     - texlive-pictures
     - texlive-latex3
+    - texlive-science
     - pgf
 script:
 - cd docs/thesis && make
