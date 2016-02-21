@@ -3,6 +3,10 @@ layout: page
 title: Preparation
 ---
 
+## PDIS Report
+
+PDF available [here]({{ site.baseurl }}public/docs/dduarte_pdis.pdf).
+
 ## 1st presentation
 
 <div><iframe class="speakerdeck-iframe" frameborder="0" src="//speakerdeck.com/player/52b120ee449846be8339f791c5f9f737?" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true" style="border: 0px; margin: 0px; padding: 0px; border-radius: 5px; width: 710px; height: 461.37499999999955px; background: transparent;"></iframe></div>
