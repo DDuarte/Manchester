@@ -20,8 +20,8 @@ abstract class Simulation {
   type Agenda = SortedMap[Long, Queue[Action]]
   type Trigger = (() => Boolean, () => Unit)
 
-  protected var curtime = 0l
-  def currentTime: Long = curtime
+  protected var curTime = 0l
+  def currentTime: Long = curTime
 
   private var agenda: Agenda = SortedMap()
   private var triggers: List[Trigger] = List()
@@ -37,12 +37,12 @@ abstract class Simulation {
 
   protected def step() {
     if (hasNext) {
-      curtime = agenda.head._1
+      curTime = agenda.head._1
 
-      while (agenda.contains(curtime)) {
+      while (agenda.contains(curTime)) {
         println("*** time = " + currentTime + " ***")
-        val actions = agenda(curtime)
-        agenda -= curtime
+        val actions = agenda(curTime)
+        agenda -= curTime
         processActions(actions)
         processTriggers()
       }
