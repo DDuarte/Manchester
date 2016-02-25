@@ -2,8 +2,18 @@ import breeze.linalg.DenseVector
 import breeze.stats.distributions.{Multinomial, Poisson, Rand}
 import org.graphstream.graph._
 import org.graphstream.graph.implementations._
+import org.mongodb.scala.bson.{BsonString, BsonArray}
+import org.mongodb.scala.{Document, MongoCollection, MongoDatabase, MongoClient}
+import org.mongodb.scala._
 
 import scala.collection.mutable
+import MongoHelpers._
+import scala.collection.JavaConversions._
+
+abstract class Action
+case class BrowseToAction(page: Page) extends Action
+case class ExitAction() extends Action
+// case class AddToCartAction() extends Action("add_to_cart")
 
 abstract class User() {
   def emitAction(currentPage: Page, website: Website): Action
@@ -66,17 +76,19 @@ class Website {
   protected val pages: mutable.MutableList[Page] = mutable.MutableList()
   protected val graph: MultiGraph = {
     val graph = new MultiGraph("Website", false, true)
-    graph.addAttribute("ui.quality")
-    graph.addAttribute("ui.antialias")
+    // graph.addAttribute("ui.quality")
+    // graph.addAttribute("ui.antialias")
     graph.addAttribute("ui.stylesheet", "node {fill-color: red; size-mode: dyn-size;} edge {fill-color:grey;}");
     graph
   }
+
+  def getHomePage: Page = pages.head
 
   def addPage(page: Page): Unit = {
     pages += page
     val node = graph.addNode[Node](page.id)
     node.setAttribute("ui.label", page.id)
-    node.setAttribute("ui.size", Int.box(14))
+    node.setAttribute("ui.size", Int.box(10))
   }
 
   def addLink(page1: Page, page2: Page): Unit = {
@@ -86,32 +98,48 @@ class Website {
 
   def visitPage(page: Page): Unit = {
     val node = graph.getNode[Node](page.id)
-    val currSize = node.getAttribute[Integer]("ui.size")
-    println("size: " + currSize)
+    val currSize = node.getAttribute[Int]("ui.size")
     node.setAttribute("ui.size", Int.box(currSize + 1))
   }
 
   def displayGraph = graph.display()
 }
 
-abstract class Action
-case class BrowseToAction(page: Page) extends Action
-case class ExitAction() extends Action
-// case class AddToCartAction() extends Action("add_to_cart")
-
 object Main extends App {
-  new Simulation {
-    System.setProperty("org.graphstream.ui.renderer", "org.graphstream.ui.j2dviewer.J2DGraphRenderer")
+  def loadMongoWebsite(): Website = {
+    val website = new Website
+    // website.displayGraph
+
+    val mongoClient: MongoClient = MongoClient("mongodb://sf:sf@ds062898.mongolab.com:62898/kugsha")
+    val database: MongoDatabase = mongoClient.getDatabase("kugsha")
+    val collection: MongoCollection[Document] = database.getCollection("atelierdecamisa-pages")
+    // val results = collection.find().foreach(doc => {
+    collection.find().results().foreach(doc => {
+      val url = doc.get[BsonString]("url").get.getValue
+      val page = Page(url)
+      website.addPage(page)
+
+      for (out <- doc.get[BsonArray]("outbound").get.getValues) {
+        val urlOut = out.asString().getValue
+        val pageOut = Page(urlOut)
+        website.addLink(page, pageOut)
+      }
+    })
+
+    website
+  }
+
+  def loadExampleWebsite(): Website = {
+    val website = new Website
+    website.displayGraph
 
     val homePage = Page("homepage")
     val electronics = Page("electronics")
-    var computers = Page("computers")
+    val computers = Page("computers")
     val lingerie = Page("lingerie")
     val football = Page("football")
     val cart = Page("cart")
 
-    val website = new Website
-    website.displayGraph
     website.addPage(homePage)
     website.addPage(lingerie)
     website.addPage(electronics)
@@ -120,11 +148,11 @@ object Main extends App {
     website.addPage(computers)
     website.addLink(homePage, electronics)
     website.addLink(homePage, lingerie)
-    // website.addLink(homePage, homePage)
+    website.addLink(homePage, homePage)
     website.addLink(electronics, homePage)
-    // website.addLink(electronics, electronics)
+    website.addLink(electronics, electronics)
     website.addLink(lingerie, homePage)
-    // website.addLink(lingerie, lingerie)
+    website.addLink(lingerie, lingerie)
     website.addLink(homePage, football)
     website.addLink(football, homePage)
     website.addLink(electronics, cart)
@@ -135,6 +163,14 @@ object Main extends App {
     website.addLink(computers, cart)
     website.addLink(computers, homePage)
     // website.addLink(homePage, computers)
+
+    website
+  }
+
+  new Simulation {
+    System.setProperty("org.graphstream.ui.renderer", "org.graphstream.ui.j2dviewer.J2DGraphRenderer")
+
+    val website = loadExampleWebsite()
 
     val users = mutable.HashMap[User, Page]()
     var lastUserId = 0
@@ -149,11 +185,10 @@ object Main extends App {
       for (i <- 0 until newUsers) {
         val user = new RandomUser(lastUserId.toString)
         lastUserId += 1
-        users.put(user, homePage)
+        //users.put(user, Page("a"))
+        users.put(user, website.getHomePage)
       }
     }
-
-
 
     def userInjector() {
       if (currentTime < 100) {
@@ -170,8 +205,8 @@ object Main extends App {
                 sleep()
                 println(s"User ${user.id} went from page ${prevPage.id} to ${nextPage.id}")
               case exit: ExitAction =>
-                users.remove(user)
-                println(s"User ${user.id} exited")
+                //users.remove(user)
+                //println(s"User ${user.id} exited")
             }
           }
 
@@ -188,7 +223,7 @@ object Main extends App {
   }
 
   def sleep(): Unit = {
-    try { Thread.sleep(0); } catch { case _: Throwable => }
+    try { Thread.sleep(50); } catch { case _: Throwable => }
   }
 
   def sleepLong(): Unit = {
