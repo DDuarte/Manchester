@@ -4,7 +4,10 @@ import org.graphstream.graph._
 import org.graphstream.graph.implementations._
 import org.mongodb.scala.bson.{BsonString, BsonArray}
 import org.mongodb.scala.{Document, MongoCollection, MongoDatabase, MongoClient}
-import org.mongodb.scala._
+import org.mongodb.scala.model.Projections._
+import org.mongodb.scala.model.Aggregates._
+import org.mongodb.scala.model.Sorts._
+
 
 import scala.collection.mutable
 import MongoHelpers._
@@ -108,13 +111,13 @@ class Website {
 object Main extends App {
   def loadMongoWebsite(): Website = {
     val website = new Website
-    // website.displayGraph
+    website.displayGraph
 
     val mongoClient: MongoClient = MongoClient("mongodb://sf:sf@ds062898.mongolab.com:62898/kugsha")
     val database: MongoDatabase = mongoClient.getDatabase("kugsha")
     val collection: MongoCollection[Document] = database.getCollection("atelierdecamisa-pages")
-    // val results = collection.find().foreach(doc => {
-    collection.find().results().foreach(doc => {
+    // collection.find().foreach(doc => {
+    collection.find().projection(exclude("content")).sort(ascending("_id")).results().foreach(doc => {
       val url = doc.get[BsonString]("url").get.getValue
       val page = Page(url)
       website.addPage(page)
