@@ -148,12 +148,12 @@ object Main extends App {
     val website = new Website
     website.displayGraph
 
-    val homePage = Page("homepage")
-    val electronics = Page("electronics")
-    val computers = Page("computers")
-    val lingerie = Page("lingerie")
-    val football = Page("football")
-    val cart = Page("cart")
+    val homePage = Page("homepage", List("_home"))
+    val electronics = Page("electronics", List("electro"))
+    val computers = Page("computers", List("electro"))
+    val lingerie = Page("lingerie", List("cloth"))
+    val football = Page("football", List("ball"))
+    val cart = Page("cart", List("_cart"))
 
     website.addPage(homePage)
     website.addPage(lingerie)
@@ -236,11 +236,7 @@ object Main extends App {
     run()
   }
 
-  def sleep(): Unit = {
-    try { Thread.sleep(50); } catch { case _: Throwable => }
-  }
-
-  def sleepLong(): Unit = {
-    try { Thread.sleep(5000); } catch { case _: Throwable => }
+  def sleep(ms: Int = 50) {
+    try { Thread.sleep(ms); } catch { case _: Throwable => }
   }
 }
