@@ -50,8 +50,7 @@ case class AffinityUser(id: String, affinities: Map[String, Double] = Map()) ext
     if (Rand.randInt(3).draw() == 2) { // 1/3
       ExitAction()
     } else {
-      val mult = new Multinomial[DenseVector[Double], Int](DenseVector(affinities.values.toArray))
-      val affSelected = affinities.keys.toIndexedSeq(mult.draw())
+      val affSelected = RandHelper.choose(affinities.keys, affinities.values).draw()
 
       val nextPage = currentPage.links.find(p => p.id.equalsIgnoreCase(affSelected)).get
 
