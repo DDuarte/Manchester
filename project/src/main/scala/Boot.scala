@@ -13,7 +13,7 @@ import scala.collection.mutable
 abstract class Action
 case class BrowseToAction(page: Page) extends Action
 case class ExitAction() extends Action
-// case class AddToCartAction() extends Action()
+case class AddToCartAction(product: Page /* FIXME */, cartPage: Page) extends Action
 
 abstract class User() {
   def emitAction(currentPage: Page, website: Website): Action
@@ -35,9 +35,12 @@ abstract class User() {
 
 case class RandomUser(id: String) extends User {
   override def emitAction(currentPage: Page, website: Website): Action = {
-    if (Rand.randInt(3).draw() == 2 /* 1/3 */ || currentPage.links.isEmpty)
+    if (Rand.randInt(3).draw() == 2 /* 33.3% */ || currentPage.links.isEmpty)
       ExitAction()
-    else {
+    else if (Rand.randInt(101).draw() <= 5 /* 5% */ && currentPage.tags.contains("_product")) {
+      val cartPage = currentPage.links.find(l => l.tags.contains("_cart")).get
+      AddToCartAction(currentPage, cartPage)
+    } else {
       val nextPage = Rand.choose(currentPage.links).draw()
       BrowseToAction(nextPage)
     }
@@ -46,12 +49,15 @@ case class RandomUser(id: String) extends User {
 
 case class AffinityUser(id: String, affinities: Map[String, Double] = Map()) extends User {
   override def emitAction(currentPage: Page, website: Website): Action = {
-    if (Rand.randInt(3).draw() == 2 /* 1/3 */ || currentPage.links.isEmpty) {
+    if (Rand.randInt(3).draw() == 2 /* 33.3% */ || currentPage.links.isEmpty)
       ExitAction()
+    else if (Rand.randInt(101).draw() <= 5 /* 5% */ && currentPage.tags.contains("_product")) {
+      val cartPage = currentPage.links.find(l => l.tags.contains("_cart")).get
+      AddToCartAction(currentPage, cartPage)
     } else {
       val affSelected = RandHelper.choose(affinities.keys, affinities.values).draw()
 
-      val links = currentPage.links.filter(p => p.tags.contains(affSelected))
+      val links = currentPage.links.filter(p => p.tags.contains(affSelected) && p.tags.contains("_product"))
 
       val nextPage = links match {
         case mutable.MutableList() => Rand.choose(currentPage.links).draw()
@@ -115,6 +121,12 @@ class Website {
     val node = graph.getNode[Node](page.id)
     val currSize = node.getAttribute[Int]("ui.size")
     node.setAttribute("ui.size", Int.box(currSize + 1))
+
+  }
+
+  def addToCart(product: Page): Unit = {
+  }
+
   }
 
   def displayGraph = graph.display()
@@ -148,10 +160,10 @@ object Main extends App {
     website.displayGraph
 
     val homePage = Page("homepage", List("_home"))
-    val electronics = Page("electronics", List("electro"))
-    val computers = Page("computers", List("electro"))
-    val lingerie = Page("lingerie", List("cloth"))
-    val football = Page("football", List("ball"))
+    val electronics = Page("electronics", List("electro", "_product"))
+    val computers = Page("computers", List("electro", "_product"))
+    val lingerie = Page("lingerie", List("cloth", "_product"))
+    val football = Page("football", List("ball", "_product"))
     val cart = Page("cart", List("_cart"))
 
     website.addLink(homePage, electronics)
@@ -198,7 +210,6 @@ object Main extends App {
       )
 
       val distribution = Poisson(5)
-      // viewHistogram2(distribution)
 
       val newUsers = distribution.draw()
       println(s"New users: $newUsers")
@@ -223,12 +234,19 @@ object Main extends App {
                 val nextPage = browse.page
                 users.update(user, nextPage)
                 website.visitPage(nextPage)
-                sleep() // animation purposes
                 println(s"User ${user.id} went from page ${prevPage.id} to ${nextPage.id}")
+              case addToCart: AddToCartAction =>
+                website.addToCart(addToCart.product)
+                website.visitPage(addToCart.cartPage)
+                website.visitPage(website.getHomePage)
+                users.update(user, website.getHomePage)
+                println(s"User ${user.id} added ${addToCart.product.id} to cart, back to homepage")
               case exit: ExitAction =>
                 users.remove(user)
                 println(s"User ${user.id} exited")
             }
+
+            sleep() // animation purposes
           }
 
           userInjector()
