@@ -1,6 +1,5 @@
 import MongoHelpers._
-import breeze.linalg.DenseVector
-import breeze.stats.distributions.{Multinomial, Poisson, Rand}
+import breeze.stats.distributions.{Poisson, Rand}
 import org.graphstream.graph._
 import org.graphstream.graph.implementations._
 import org.mongodb.scala.MongoClient
@@ -47,27 +46,22 @@ case class RandomUser(id: String) extends User {
 
 case class AffinityUser(id: String, affinities: Map[String, Double] = Map()) extends User {
   override def emitAction(currentPage: Page, website: Website): Action = {
-    if (Rand.randInt(3).draw() == 2) { // 1/3
+    if (Rand.randInt(3).draw() == 2 /* 1/3 */ || currentPage.links.isEmpty) {
       ExitAction()
     } else {
       val affSelected = RandHelper.choose(affinities.keys, affinities.values).draw()
 
-      val nextPage = currentPage.links.find(p => p.id.equalsIgnoreCase(affSelected)).get
+      val links = currentPage.links.filter(p => p.tags.contains(affSelected))
+
+      val nextPage = links match {
+        case mutable.MutableList() => Rand.choose(currentPage.links).draw()
+        case mutable.MutableList(l) => l
+        case _ => Rand.choose(links).draw()
+      }
 
       BrowseToAction(nextPage)
     }
   }
-
-  /* val personas = Array(
-    Map(
-      "lingerie" -> 0.3,
-      "electronics" -> 0.7
-    ),
-    Map(
-      "lingerie" -> 0.7,
-      "electronics" -> 0.3
-    )
-  ) */
 }
 
 case class Page(val id: String, val tags: List[String] = List()) {
@@ -159,7 +153,7 @@ object Main extends App {
     val lingerie = Page("lingerie", List("cloth"))
     val football = Page("football", List("ball"))
     val cart = Page("cart", List("_cart"))
-  
+
     website.addLink(homePage, electronics)
     website.addLink(homePage, lingerie)
     website.addLink(homePage, homePage)
@@ -190,6 +184,19 @@ object Main extends App {
     var lastUserId = 0
 
     def newUsers() {
+
+      val personas = Array(
+        Map(
+          "cloth" -> 0.1,
+          "electro" -> 0.4,
+          "ball" -> 0.5
+        ),
+        Map(
+          "cloth" -> 0.9,
+          "electro" -> 0.1
+        )
+      )
+
       val distribution = Poisson(5)
       // viewHistogram2(distribution)
 
@@ -197,7 +204,8 @@ object Main extends App {
       println(s"New users: $newUsers")
 
       for (i <- 0 until newUsers) {
-        val user = new RandomUser(lastUserId.toString)
+        // val user = new RandomUser(lastUserId.toString)
+        val user = AffinityUser(lastUserId.toString, RandHelper.choose(personas, List(0.5, 0.5)).draw())
         lastUserId += 1
         users.put(user, website.getHomePage)
       }
