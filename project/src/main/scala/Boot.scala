@@ -7,6 +7,7 @@ import org.mongodb.scala.bson.{BsonArray, BsonString}
 import org.mongodb.scala.model.Projections._
 import org.mongodb.scala.model.Sorts._
 
+import scala.StringBuilder
 import scala.collection.JavaConversions._
 import scala.collection.mutable
 
@@ -97,6 +98,9 @@ class Website {
     graph
   }
 
+  protected val visits = mutable.HashMap[Page, Long]()
+  protected val purchases = mutable.HashMap[Page /* Product */, Long]()
+
   def getHomePage = pages.head
 
   def addPage(page: Page) {
@@ -122,11 +126,32 @@ class Website {
     val currSize = node.getAttribute[Int]("ui.size")
     node.setAttribute("ui.size", Int.box(currSize + 1))
 
+    visits += (page -> (visits.getOrElse(page, 0l) + 1l))
   }
 
   def addToCart(product: Page): Unit = {
+    purchases += (product -> (purchases.getOrElse(product, 0l) + 1l))
   }
 
+  def getStats: String = {
+    val sb = new StringBuilder()
+
+    sb ++= "--- Website statistics ---\n"
+    sb ++= "\n- Visits:\n"
+
+    visits.foreach {
+      case (page, count) =>
+        sb ++= f"${page.id}%15s $count%5d\n"
+    }
+
+    sb ++= "\n- Purchases:\n"
+
+    purchases.foreach {
+      case (product, count) =>
+        sb ++= f"${product.id}%15s $count%5d\n"
+    }
+
+    sb.toString()
   }
 
   def displayGraph = graph.display()
@@ -259,6 +284,8 @@ object Main extends App {
     }
 
     run()
+
+    println(website.getStats)
   }
 
   def sleep(ms: Int = 50) {
