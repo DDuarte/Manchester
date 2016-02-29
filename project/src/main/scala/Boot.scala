@@ -100,6 +100,7 @@ class Website {
 
   protected val visits = mutable.HashMap[Page, Long]()
   protected val purchases = mutable.HashMap[Page /* Product */, Long]()
+  protected var uniqueUserCount = 0l
 
   def getHomePage = pages.head
 
@@ -133,10 +134,17 @@ class Website {
     purchases += (product -> (purchases.getOrElse(product, 0l) + 1l))
   }
 
+  def newUser() = {
+    uniqueUserCount += 1
+  }
+
   def getStats: String = {
     val sb = new StringBuilder()
 
     sb ++= "--- Website statistics ---\n"
+
+    sb ++= "\n- Unique users: " ++= uniqueUserCount.toString ++= "\n"
+
     sb ++= "\n- Visits:\n"
 
     visits.foreach {
@@ -244,6 +252,7 @@ object Main extends App {
         val user = AffinityUser(lastUserId.toString, RandHelper.choose(personas, List(0.5, 0.5)).draw())
         lastUserId += 1
         users.put(user, website.getHomePage)
+        website.newUser()
       }
     }
 
