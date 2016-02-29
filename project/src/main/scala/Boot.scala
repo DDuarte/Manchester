@@ -1,22 +1,20 @@
+import MongoHelpers._
 import breeze.linalg.DenseVector
 import breeze.stats.distributions.{Multinomial, Poisson, Rand}
 import org.graphstream.graph._
 import org.graphstream.graph.implementations._
-import org.mongodb.scala.bson.{BsonString, BsonArray}
-import org.mongodb.scala.{Document, MongoCollection, MongoDatabase, MongoClient}
+import org.mongodb.scala.MongoClient
+import org.mongodb.scala.bson.{BsonArray, BsonString}
 import org.mongodb.scala.model.Projections._
-import org.mongodb.scala.model.Aggregates._
 import org.mongodb.scala.model.Sorts._
 
-
-import scala.collection.mutable
-import MongoHelpers._
 import scala.collection.JavaConversions._
+import scala.collection.mutable
 
 abstract class Action
 case class BrowseToAction(page: Page) extends Action
 case class ExitAction() extends Action
-// case class AddToCartAction() extends Action("add_to_cart")
+// case class AddToCartAction() extends Action()
 
 abstract class User() {
   def emitAction(currentPage: Page, website: Website): Action
@@ -73,33 +71,48 @@ case class AffinityUser(id: String, affinities: Map[String, Double] = Map()) ext
   ) */
 }
 
-case class Page(id: String, links: mutable.MutableList[Page] = mutable.MutableList(), tags: List[String] = List())
+case class Page(val id: String, val tags: List[String] = List()) {
+  val links: mutable.MutableList[Page] = mutable.MutableList()
+
+  def canEqual(other: Any): Boolean = other.isInstanceOf[Page]
+
+  override def equals(other: Any): Boolean = other match {
+    case that: Page =>
+      (that canEqual this) &&
+        id == that.id
+    case _ => false
+  }
+
+  override def hashCode(): Int = {
+    id.hashCode
+  }
+}
 
 class Website {
-  protected val pages: mutable.MutableList[Page] = mutable.MutableList()
-  protected val graph: MultiGraph = {
+  protected val pages = mutable.HashSet[Page]()
+  protected val graph = {
     val graph = new MultiGraph("Website", false, true)
     // graph.addAttribute("ui.quality")
     // graph.addAttribute("ui.antialias")
-    graph.addAttribute("ui.stylesheet", "node {fill-color: red; size-mode: dyn-size;} edge {fill-color:grey;}");
+    graph.addAttribute("ui.stylesheet", "node {fill-color: red; size-mode: dyn-size;} edge {fill-color:grey;}")
     graph
   }
 
-  def getHomePage: Page = pages.head
+  def getHomePage = pages.head
 
-  def addPage(page: Page): Unit = {
+  def addPage(page: Page) {
     pages += page
     val node = graph.addNode[Node](page.id)
     node.setAttribute("ui.label", page.id)
-    node.setAttribute("ui.size", Int.box(10))
+    node.setAttribute("ui.size", Int.box(1))
   }
 
-  def addLink(page1: Page, page2: Page): Unit = {
+  def addLink(page1: Page, page2: Page) {
     page1.links += page2
-    graph.addEdge(page1.id + "-" + page2.id + "-" + Rand.randInt(1000), page1.id, page2.id)
+    graph.addEdge(s"${page1.id}-${page2.id}-${Rand.randInt(1000)}", page1.id, page2.id)
   }
 
-  def visitPage(page: Page): Unit = {
+  def visitPage(page: Page) {
     val node = graph.getNode[Node](page.id)
     val currSize = node.getAttribute[Int]("ui.size")
     node.setAttribute("ui.size", Int.box(currSize + 1))
@@ -113,10 +126,9 @@ object Main extends App {
     val website = new Website
     website.displayGraph
 
-    val mongoClient: MongoClient = MongoClient("mongodb://sf:sf@ds062898.mongolab.com:62898/kugsha")
-    val database: MongoDatabase = mongoClient.getDatabase("kugsha")
-    val collection: MongoCollection[Document] = database.getCollection("atelierdecamisa-pages")
-    // collection.find().foreach(doc => {
+    val mongoClient = MongoClient("mongodb://sf:sf@ds062898.mongolab.com:62898/kugsha")
+    val database = mongoClient.getDatabase("kugsha")
+    val collection = database.getCollection("atelierdecamisa-pages")
     collection.find().projection(exclude("content")).sort(ascending("_id")).results().foreach(doc => {
       val url = doc.get[BsonString]("url").get.getValue
       val page = Page(url)
