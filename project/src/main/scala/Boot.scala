@@ -108,6 +108,12 @@ class Website {
   }
 
   def addLink(page1: Page, page2: Page) {
+    if (!pages.contains(page1))
+      addPage(page1)
+
+    if (!pages.contains(page2))
+      addPage(page2)
+
     page1.links += page2
     graph.addEdge(s"${page1.id}-${page2.id}-${Rand.randInt(1000)}", page1.id, page2.id)
   }
@@ -154,13 +160,7 @@ object Main extends App {
     val lingerie = Page("lingerie", List("cloth"))
     val football = Page("football", List("ball"))
     val cart = Page("cart", List("_cart"))
-
-    website.addPage(homePage)
-    website.addPage(lingerie)
-    website.addPage(electronics)
-    website.addPage(football)
-    website.addPage(cart)
-    website.addPage(computers)
+  
     website.addLink(homePage, electronics)
     website.addLink(homePage, lingerie)
     website.addLink(homePage, homePage)
