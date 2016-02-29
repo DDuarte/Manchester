@@ -188,13 +188,12 @@ object Main extends App {
       for (i <- 0 until newUsers) {
         val user = new RandomUser(lastUserId.toString)
         lastUserId += 1
-        //users.put(user, Page("a"))
         users.put(user, website.getHomePage)
       }
     }
 
     def userInjector() {
-      if (currentTime < 100) {
+      if (currentTime < 10) {
         schedule(1) {
           newUsers()
           users.foreach { case (user: User, page: Page) =>
@@ -205,11 +204,11 @@ object Main extends App {
                 val nextPage = browse.page
                 users.update(user, nextPage)
                 website.visitPage(nextPage)
-                sleep()
+                sleep() // animation purposes
                 println(s"User ${user.id} went from page ${prevPage.id} to ${nextPage.id}")
               case exit: ExitAction =>
-                //users.remove(user)
-                //println(s"User ${user.id} exited")
+                users.remove(user)
+                println(s"User ${user.id} exited")
             }
           }
 
