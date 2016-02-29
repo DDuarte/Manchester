@@ -98,11 +98,10 @@ class Website {
     graph
   }
 
+  var homepage: Page = null
   protected val visits = mutable.HashMap[Page, Long]()
   protected val purchases = mutable.HashMap[Page /* Product */, Long]()
   protected var uniqueUserCount = 0l
-
-  def getHomePage = pages.head
 
   def addPage(page: Page) {
     pages += page
@@ -192,30 +191,31 @@ object Main extends App {
     val website = new Website
     website.displayGraph
 
-    val homePage = Page("homepage", List("_home"))
+    val homepage = Page("homepage", List("_home"))
     val electronics = Page("electronics", List("electro", "_product"))
     val computers = Page("computers", List("electro", "_product"))
     val lingerie = Page("lingerie", List("cloth", "_product"))
     val football = Page("football", List("ball", "_product"))
     val cart = Page("cart", List("_cart"))
 
-    website.addLink(homePage, electronics)
-    website.addLink(homePage, lingerie)
-    website.addLink(homePage, homePage)
-    website.addLink(electronics, homePage)
+    website.homepage = homepage
+    website.addLink(homepage, electronics)
+    website.addLink(homepage, lingerie)
+    website.addLink(homepage, homepage)
+    website.addLink(electronics, homepage)
     website.addLink(electronics, electronics)
-    website.addLink(lingerie, homePage)
+    website.addLink(lingerie, homepage)
     website.addLink(lingerie, lingerie)
-    website.addLink(homePage, football)
-    website.addLink(football, homePage)
+    website.addLink(homepage, football)
+    website.addLink(football, homepage)
     website.addLink(electronics, cart)
     website.addLink(lingerie, cart)
     website.addLink(football, cart)
-    website.addLink(cart, homePage)
+    website.addLink(cart, homepage)
     website.addLink(electronics, computers)
     website.addLink(computers, cart)
-    website.addLink(computers, homePage)
-    // website.addLink(homePage, computers)
+    website.addLink(computers, homepage)
+    // website.addLink(homepage, computers)
 
     website
   }
@@ -251,7 +251,8 @@ object Main extends App {
         // val user = new RandomUser(lastUserId.toString)
         val user = AffinityUser(lastUserId.toString, RandHelper.choose(personas, List(0.5, 0.5)).draw())
         lastUserId += 1
-        users.put(user, website.getHomePage)
+        users.put(user, website.homepage)
+        website.visitPage(website.homepage)
         website.newUser()
       }
     }
@@ -272,8 +273,8 @@ object Main extends App {
               case addToCart: AddToCartAction =>
                 website.addToCart(addToCart.product)
                 website.visitPage(addToCart.cartPage)
-                website.visitPage(website.getHomePage)
-                users.update(user, website.getHomePage)
+                website.visitPage(website.homepage)
+                users.update(user, website.homepage)
                 println(s"User ${user.id} added ${addToCart.product.id} to cart, back to homepage")
               case exit: ExitAction =>
                 users.remove(user)
