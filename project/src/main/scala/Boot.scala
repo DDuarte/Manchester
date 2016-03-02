@@ -7,7 +7,6 @@ import org.mongodb.scala.bson.{BsonArray, BsonString}
 import org.mongodb.scala.model.Projections._
 import org.mongodb.scala.model.Sorts._
 
-import scala.StringBuilder
 import scala.collection.JavaConversions._
 import scala.collection.mutable
 
@@ -53,6 +52,7 @@ case class AffinityUser(id: String, affinities: Map[String, Double] = Map()) ext
     if (Rand.randInt(3).draw() == 2 /* 33.3% */ || currentPage.links.isEmpty)
       ExitAction()
     else if (Rand.randInt(101).draw() <= 5 /* 5% */ && currentPage.tags.contains("_product")) {
+      // assumed that a product page links to a cart page
       val cartPage = currentPage.links.find(l => l.tags.contains("_cart")).get
       AddToCartAction(currentPage, cartPage)
     } else {
@@ -146,14 +146,14 @@ class Website {
 
     sb ++= "\n- Visits:\n"
 
-    visits.foreach {
+    visits.toSeq.sortWith(_._2 > _._2).foreach {
       case (page, count) =>
         sb ++= f"${page.id}%15s $count%5d\n"
     }
 
     sb ++= "\n- Purchases:\n"
 
-    purchases.foreach {
+    purchases.toSeq.sortWith(_._2 > _._2).foreach {
       case (product, count) =>
         sb ++= f"${product.id}%15s $count%5d\n"
     }
