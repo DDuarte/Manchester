@@ -230,16 +230,22 @@ object Main extends App {
 
     def newUsers() {
 
-      val personas = Array(
+      val personas = Map(
         Map(
-          "cloth" -> 0.1,
-          "electro" -> 0.4,
-          "ball" -> 0.5
-        ),
+          "cloth" -> 0.3,
+          "electro" -> 0.1,
+          "sports" -> 0.6
+          ) -> 1.0,
         Map(
           "cloth" -> 0.9,
-          "electro" -> 0.1
-        )
+          "electro" -> 0.1,
+          "sports" -> 0.0
+        ) -> 1.0,
+        Map(
+          "cloth" -> 0.2,
+          "electro" -> 0.6,
+          "sports" -> 0.2
+        ) -> 2.0
       )
 
       val distribution = Poisson(5)
@@ -249,7 +255,7 @@ object Main extends App {
 
       for (i <- 0 until newUsers) {
         // val user = new RandomUser(lastUserId.toString)
-        val user = AffinityUser(lastUserId.toString, RandHelper.choose(personas, List(0.5, 0.5)).draw())
+        val user = AffinityUser(lastUserId.toString, RandHelper.choose(personas).draw())
         lastUserId += 1
         users.put(user, website.homepage)
         website.visitPage(website.homepage)

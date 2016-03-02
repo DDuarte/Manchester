@@ -2,14 +2,12 @@ import breeze.linalg.DenseVector
 import breeze.stats.distributions.{Multinomial, Rand}
 
 object RandHelper {
-  def choose[T](c: Iterable[T], weights: Iterable[Double]) : Rand[T] = new Rand[T] {
+  def choose[T](weightsMap: Map[T, Double]) : Rand[T] = new Rand[T] {
     def draw() = {
-      require(c.nonEmpty && weights.nonEmpty, "collections cannot be empty")
+      require(weightsMap.nonEmpty, "map cannot be empty")
 
-      val indexed = c.toIndexedSeq
-      val weightsNArray = normalize(weights).toArray
-
-      require(indexed.size == weightsNArray.length, "collections need to have the same size")
+      val indexed = weightsMap.keys.toIndexedSeq
+      val weightsNArray = normalize(weightsMap.values).toArray
 
       val mult = new Multinomial[DenseVector[Double], Int](DenseVector(weightsNArray))
       indexed(mult.draw())
