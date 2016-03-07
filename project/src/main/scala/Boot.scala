@@ -16,7 +16,7 @@ case class BrowseToAction(page: Page) extends Action
 case class ExitAction() extends Action
 case class AddToCartAction(product: Page /* FIXME */, cartPage: Page) extends Action
 
-abstract class User(id: String) {
+abstract class User(val id: String) {
   def emitAction(currentPage: Page, website: Website): Action
 
   def canEqual(other: Any): Boolean = other.isInstanceOf[User]
@@ -33,7 +33,7 @@ abstract class User(id: String) {
   }
 }
 
-case class RandomUser(id: String) extends User(id) {
+case class RandomUser(userId: String) extends User(userId) {
   override def emitAction(currentPage: Page, website: Website): Action = {
     if (Rand.randInt(3).draw() == 2 /* 33.3% */ || currentPage.links.isEmpty)
       ExitAction()
@@ -47,7 +47,7 @@ case class RandomUser(id: String) extends User(id) {
   }
 }
 
-case class AffinityUser(id: String, affinities: Map[String, Double] = Map()) extends User(id) {
+case class AffinityUser(userId: String, affinities: Map[String, Double] = Map()) extends User(userId) {
   override def emitAction(currentPage: Page, website: Website): Action = {
     if (Rand.randInt(3).draw() == 2 /* 33.3% */ || currentPage.links.isEmpty)
       ExitAction()
