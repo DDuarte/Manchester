@@ -10,6 +10,7 @@ import org.mongodb.scala.model.Sorts._
 import scala.collection.JavaConversions._
 import scala.collection.immutable.HashSet
 import scala.collection.mutable.{Set => MSet, HashMap => MHashMap}
+import com.typesafe.config.ConfigFactory
 
 abstract class Action
 case class BrowseToAction(page: Page) extends Action
@@ -37,8 +38,8 @@ case class RandomUser(userId: String) extends User(userId) {
   override def emitAction(currentPage: Page, website: Website): Action = {
     if (Rand.randInt(3).draw() == 2 /* 33.3% */ || currentPage.links.isEmpty)
       ExitAction()
-    else if (Rand.randInt(101).draw() <= 5 /* 5% */ && currentPage.tags.contains("_product")) {
-      val cartPage = currentPage.links.find(l => l.tags.contains("_cart")).get
+    else if (Rand.randInt(101).draw() <= 5 /* 5% */ && currentPage.tags.contains(website.pageTypes.product)) {
+      val cartPage = currentPage.links.find(l => l.tags.contains(website.pageTypes.cart)).get
       AddToCartAction(currentPage, cartPage)
     } else {
       val nextPage = Rand.choose(currentPage.links).draw()
@@ -51,15 +52,15 @@ case class AffinityUser(userId: String, affinities: Map[String, Double] = Map())
   override def emitAction(currentPage: Page, website: Website): Action = {
     if (Rand.randInt(3).draw() == 2 /* 33.3% */ || currentPage.links.isEmpty)
       ExitAction()
-    else if (Rand.randInt(101).draw() <= 5 /* 5% */ && currentPage.tags.contains("_product")) {
+    else if (Rand.randInt(101).draw() <= 5 /* 5% */ && currentPage.tags.contains(website.pageTypes.product)) {
       // assumed that a product page links to a cart page
-      val cartPage = currentPage.links.find(l => l.tags.contains("_cart")).get
+      val cartPage = currentPage.links.find(l => l.tags.contains(website.pageTypes.cart)).get
       AddToCartAction(currentPage, cartPage)
     } else {
       val affSelected = RandHelper.choose(affinities).draw()
 
       val links = currentPage.links.filter(p => p.tags.contains(affSelected) &&
-        (p.tags.contains("_product") || p.tags.contains("_productList")))
+        (p.tags.contains(website.pageTypes.product) || p.tags.contains(website.pageTypes.list)))
 
       val nextPage = if (links.isEmpty)
         Rand.choose(currentPage.links).draw()
@@ -86,9 +87,7 @@ case class Page(id: String, links: MSet[Page], tags: Set[String]) {
   }
 }
 
-case class Website(pages: Set[Page], homepage: Page) {
-
-}
+case class Website(pages: Set[Page], homepage: Page, pageTypes: WebsitePageTypes)
 
 class WebsiteState(website: Website) {
   protected val visits = MHashMap[Page, Long]()
@@ -178,12 +177,26 @@ class WebsiteStateVisualization(website: Website) extends WebsiteState(website) 
   }
 }
 
+case class WebsitePageTypes(
+  list: String,
+  product: String,
+  cart: String,
+  generic: String)
+
 object Main extends App {
+  val config = ConfigFactory.load()
+
+  val pageTypes = WebsitePageTypes(
+    config.getString("types.list"),
+    config.getString("types.product"),
+    config.getString("types.cart"),
+    config.getString("types.generic")
+  )
+
   def loadMongoWebsite(): Website = {
-    val mongoClient = MongoClient("mongodb://localhost")
-    val database = mongoClient.getDatabase("kugsha")
-    //val collection = database.getCollection("atelierdecamisa-pages")
-    val collection = database.getCollection("clickfiel-pages")
+    val mongoClient = MongoClient(config.getString("mongodb.url"))
+    val database = mongoClient.getDatabase(config.getString("mongodb.db"))
+    val collection = database.getCollection(config.getString("mongodb.collection"))
 
     var homepageId: String = null
 
@@ -198,16 +211,16 @@ object Main extends App {
         if (homepageId == null) homepageId = url
 
         val pageType = doc.get[BsonString]("type").map(_.asString().getValue) match {
-          case Some("list") => "_productList"
-          case Some("product") => "_product"
-          case Some("cart") => "_cart"
-          case Some("generic") => "_generic"
+          case Some("list") => pageTypes.list
+          case Some("product") => pageTypes.product
+          case Some("cart") => pageTypes.cart
+          case Some("generic") => pageTypes.generic
           case Some(t) =>
             Console.err.println(s"Page $url has unknown type $t")
-            "_generic"
+            pageTypes.generic
           case None =>
             Console.err.println(s"Page $url has no type")
-            " _generic"
+            pageTypes.generic
         }
 
         val tags: HashSet[String] = doc.get[BsonArray]("category") match {
@@ -229,19 +242,19 @@ object Main extends App {
       })
     })
 
-    Website(pages.map(p => p._2._1).toSet, pages.get(homepageId).get._1)
+    Website(pages.map(p => p._2._1).toSet, pages.get(homepageId).get._1, pageTypes)
   }
 
   def loadExampleWebsite(): Website = {
-    val homepage = Page("homepage", MSet(), Set("_home"))
-    val electronics = Page("electronics", MSet(), Set("electro", "_productList"))
-    val computers = Page("computers", MSet(), Set("electro", "_product"))
-    val lingerie = Page("lingerie", MSet(), Set("cloth", "_product"))
-    val tshirts = Page("tshirts", MSet(), Set("cloth", "_product"))
-    val football = Page("football", MSet(), Set("sports", "football", "_product"))
-    val cloth = Page("cloth", MSet(), Set("cloth", "_productList"))
-    val sports = Page("sports", MSet(), Set("sports", "football", "_productList"))
-    val cart = Page("cart", MSet(), Set("_cart"))
+    val homepage = Page("homepage", MSet(), Set(pageTypes.generic))
+    val electronics = Page("electronics", MSet(), Set("electro", pageTypes.list))
+    val computers = Page("computers", MSet(), Set("electro", pageTypes.product))
+    val lingerie = Page("lingerie", MSet(), Set("cloth", pageTypes.product))
+    val tshirts = Page("tshirts", MSet(), Set("cloth", pageTypes.product))
+    val football = Page("football", MSet(), Set("sports", "football", pageTypes.product))
+    val cloth = Page("cloth", MSet(), Set("cloth", pageTypes.list))
+    val sports = Page("sports", MSet(), Set("sports", "football", pageTypes.list))
+    val cart = Page("cart", MSet(), Set(pageTypes.cart))
 
     homepage.links += (electronics, cloth, sports, homepage)
     electronics.links += (computers, homepage, electronics)
@@ -252,7 +265,7 @@ object Main extends App {
     lingerie.links += (cart, homepage, cloth, tshirts, lingerie)
     football.links += (cart, homepage, sports, football)
 
-    Website(Set(homepage, electronics, cloth, sports, computers, tshirts, lingerie, football), homepage)
+    Website(Set(homepage, electronics, cloth, sports, computers, tshirts, lingerie, football), homepage, pageTypes)
   }
 
   new Simulation {
@@ -271,7 +284,7 @@ object Main extends App {
         ) -> 1.0
       )
 
-      val distribution = Poisson(5)
+      val distribution = Poisson(25)
 
       val newUsers = distribution.draw()
       println(s"New users: $newUsers")
@@ -286,7 +299,7 @@ object Main extends App {
     }
 
     def userInjector() {
-      if (currentTime < 5) {
+      if (currentTime < 100) {
         schedule(1) {
           newUsers()
           state.users.foreach { case (user: User, page: Page) =>

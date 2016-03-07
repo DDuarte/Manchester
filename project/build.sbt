@@ -10,7 +10,8 @@ libraryDependencies  ++= Seq(
   "org.scalanlp" %% "breeze-viz" % "0.12",
   "org.graphstream" % "gs-core" % "1.3",
   "org.graphstream" % "gs-ui" % "1.3",
-  "org.mongodb.scala" %% "mongo-scala-driver" % "1.1.0"
+  "org.mongodb.scala" %% "mongo-scala-driver" % "1.1.0",
+  "com.typesafe" % "config" % "1.3.0"
 )
 
 resolvers ++= Seq(
