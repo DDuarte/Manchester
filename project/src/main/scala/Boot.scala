@@ -193,10 +193,10 @@ object Main extends App {
     config.getString("types.generic")
   )
 
-  def loadMongoWebsite(): Website = {
-    val mongoClient = MongoClient(config.getString("mongodb.url"))
-    val database = mongoClient.getDatabase(config.getString("mongodb.db"))
-    val collection = database.getCollection(config.getString("mongodb.collection"))
+  def loadMongoWebsite(url: String, dbName: String, collectionName: String): Website = {
+    val mongoClient = MongoClient(url)
+    val database = mongoClient.getDatabase(dbName)
+    val collection = database.getCollection(collectionName)
 
     var homepageId: String = null
 
@@ -224,7 +224,7 @@ object Main extends App {
         }
 
         val tags: HashSet[String] = doc.get[BsonArray]("category") match {
-          case Some(categories: BsonArray) => HashSet(pageType) ++ categories.getValues.map(_.asString().getValue)
+          case Some(categories) => HashSet(pageType) ++ categories.getValues.map(_.asString().getValue)
           case None => HashSet[String](pageType)
         }
 
@@ -271,7 +271,13 @@ object Main extends App {
   new Simulation {
     // System.setProperty("org.graphstream.ui.renderer", "org.graphstream.ui.j2dviewer.J2DGraphRenderer")
 
-    val website = Utilities.time("load website") { loadExampleWebsite() }
+    val website = Utilities.time("load website") {
+      loadMongoWebsite(
+      config.getString("mongodb.url"),
+      config.getString("mongodb.db"),
+      config.getString("mongodb.collection"))
+    }
+
     val state = new WebsiteStateVisualization(website)
     state.display
 
