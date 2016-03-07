@@ -41,20 +41,9 @@ abstract class Simulation {
 
   def run() {
     schedule(0) {
-      println("*** simulation started, time = "+currentTime+" ***")
+      println("*** simulation started, time = " + currentTime + " ***")
     }
 
     while (agenda.nonEmpty) step()
   }
-}
-
-trait SimulationStatistics extends Simulation {
-  private var numActions: Int = 0
-
-  override def processActions(actions: Seq[Action]) {
-    numActions += actions.size
-    super.processActions(actions)
-  }
-
-  def actionCount = numActions
 }

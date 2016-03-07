@@ -1,5 +1,3 @@
-import java.util.concurrent.TimeUnit
-
 object Utilities {
   def time[R](str: String = "")(block: => R): R = {
     val t0 = System.currentTimeMillis()
