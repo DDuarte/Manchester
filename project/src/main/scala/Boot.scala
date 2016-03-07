@@ -99,6 +99,7 @@ class Website {
     graph
   }
 
+  var visualizationEnabled = false
   var homepage: Page = null
   protected val visits = mutable.HashMap[Page, Long]()
   protected val purchases = mutable.HashMap[Page /* Product */, Long]()
@@ -107,9 +108,11 @@ class Website {
   def addPage(page: Page) {
     pages += page
 
-    val node = graph.addNode[Node](page.id)
-    node.setAttribute("ui.label", page.id)
-    node.setAttribute("ui.size", Double.box(1))
+    if (visualizationEnabled) {
+      val node = graph.addNode[Node](page.id)
+      node.setAttribute("ui.label", page.id)
+      node.setAttribute("ui.size", Double.box(1))
+    }
   }
 
   def addLink(page1: Page, page2: Page): Unit = addLink(page1.id, page2.id)
@@ -123,24 +126,30 @@ class Website {
       case None => println("Page (2) " + page2Id + " not found!")
     }
 
-    graph.addEdge(s"$page1Id-$page2Id-${Rand.randInt(1000)}", page1Id, page2Id)
+    if (visualizationEnabled) {
+      graph.addEdge(s"$page1Id-$page2Id-${Rand.randInt(1000)}", page1Id, page2Id)
+    }
   }
 
   def visitPage(page: Page) {
-    val node = graph.getNode[Node](page.id)
-    val currSize = node.getAttribute[Double]("ui.size")
-    node.setAttribute("ui.size", Double.box(currSize + 0.05))
+    if (visualizationEnabled) {
+      val node = graph.getNode[Node](page.id)
+      val currSize = node.getAttribute[Double]("ui.size")
+      node.setAttribute("ui.size", Double.box(currSize + 0.05))
+      normalizeSizes()
+    }
 
     visits += (page -> (visits.getOrElse(page, 0l) + 1l))
-    normalizeSizes()
   }
 
   def normalizeSizes(): Unit = {
-    graph.getNodeIterator[Node].foreach(node => {
-      val currSize = node.getAttribute[Double]("ui.size")
-      if (currSize > 10)
-        node.setAttribute("ui.size", Double.box(currSize / 10.0))
-    })
+    if (visualizationEnabled) {
+      graph.getNodeIterator[Node].foreach(node => {
+        val currSize = node.getAttribute[Double]("ui.size")
+        if (currSize > 10)
+          node.setAttribute("ui.size", Double.box(currSize / 10.0))
+      })
+    }
   }
 
   def addToCart(product: Page): Unit = {
@@ -175,13 +184,13 @@ class Website {
     sb.toString()
   }
 
-  def displayGraph = graph.display()
+  def displayGraph = if (visualizationEnabled) graph.display()
 }
 
 object Main extends App {
   def loadMongoWebsite(): Website = {
     val website = new Website
-    // website.displayGraph
+    website.displayGraph
 
     val mongoClient = MongoClient("mongodb://localhost")
     val database = mongoClient.getDatabase("kugsha")
