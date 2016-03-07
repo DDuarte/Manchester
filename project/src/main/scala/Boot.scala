@@ -196,6 +196,8 @@ object Main extends App {
     val database = mongoClient.getDatabase("kugsha")
     //val collection = database.getCollection("atelierdecamisa-pages")
     val collection = database.getCollection("clickfiel-pages")
+
+    // TODO: fix the double iteration over pages
     collection.find().projection(include("url", "type", "category")).sort(ascending("_id")).results().foreach(doc => {
       val url = doc.get[BsonString]("url").get.getValue
 
@@ -292,7 +294,7 @@ object Main extends App {
   new Simulation {
     // System.setProperty("org.graphstream.ui.renderer", "org.graphstream.ui.j2dviewer.J2DGraphRenderer")
 
-    val website = loadMongoWebsite()
+    val website = Utilities.time("load website") { loadMongoWebsite() }
 
     val users = mutable.HashMap[User, Page]()
     var lastUserId = 0
