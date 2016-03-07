@@ -9,16 +9,15 @@ import org.mongodb.scala.model.Sorts._
 
 import scala.collection.JavaConversions._
 import scala.collection.immutable.HashSet
-import scala.collection.mutable
+import scala.collection.mutable.{Set => MSet, HashMap => MHashMap}
 
 abstract class Action
 case class BrowseToAction(page: Page) extends Action
 case class ExitAction() extends Action
 case class AddToCartAction(product: Page /* FIXME */, cartPage: Page) extends Action
 
-abstract class User() {
+abstract class User(val id: String) {
   def emitAction(currentPage: Page, website: Website): Action
-  val id: String
 
   def canEqual(other: Any): Boolean = other.isInstanceOf[User]
 
@@ -34,7 +33,7 @@ abstract class User() {
   }
 }
 
-case class RandomUser(id: String) extends User {
+case class RandomUser(val userId: String) extends User(userId) {
   override def emitAction(currentPage: Page, website: Website): Action = {
     if (Rand.randInt(3).draw() == 2 /* 33.3% */ || currentPage.links.isEmpty)
       ExitAction()
@@ -48,7 +47,7 @@ case class RandomUser(id: String) extends User {
   }
 }
 
-case class AffinityUser(id: String, affinities: Map[String, Double] = Map()) extends User {
+case class AffinityUser(userId: String, affinities: Map[String, Double] = Map()) extends User(userId) {
   override def emitAction(currentPage: Page, website: Website): Action = {
     if (Rand.randInt(3).draw() == 2 /* 33.3% */ || currentPage.links.isEmpty)
       ExitAction()
@@ -72,9 +71,7 @@ case class AffinityUser(id: String, affinities: Map[String, Double] = Map()) ext
   }
 }
 
-case class Page(val id: String, val tags: Set[String] = HashSet()) {
-  val links: mutable.HashSet[Page] = mutable.HashSet()
-
+case class Page(id: String, links: MSet[Page], tags: Set[String]) {
   def canEqual(other: Any): Boolean = other.isInstanceOf[Page]
 
   override def equals(other: Any): Boolean = other match {
@@ -89,67 +86,19 @@ case class Page(val id: String, val tags: Set[String] = HashSet()) {
   }
 }
 
-class Website {
-  protected val pages = mutable.HashSet[Page]()
-  protected val graph = {
-    val graph = new MultiGraph("Website", false, true)
-    // graph.addAttribute("ui.quality")
-    // graph.addAttribute("ui.antialias")
-    graph.addAttribute("ui.stylesheet", "node {fill-color: red; size-mode: dyn-size;} edge {fill-color:grey;}")
-    graph
-  }
+case class Website(pages: Set[Page], homepage: Page) {
 
-  var visualizationEnabled = false
-  var homepage: Page = null
-  protected val visits = mutable.HashMap[Page, Long]()
-  protected val purchases = mutable.HashMap[Page /* Product */, Long]()
+}
+
+class WebsiteState(website: Website) {
+  protected val visits = MHashMap[Page, Long]()
+  protected val purchases = MHashMap[Page /* Product */, Long]()
   protected var uniqueUserCount = 0l
-
-  def addPage(page: Page) {
-    pages += page
-
-    if (visualizationEnabled) {
-      val node = graph.addNode[Node](page.id)
-      node.setAttribute("ui.label", page.id)
-      node.setAttribute("ui.size", Double.box(1))
-    }
-  }
-
-  def addLink(page1: Page, page2: Page): Unit = addLink(page1.id, page2.id)
-
-  def addLink(page1Id: String, page2Id: String) {
-    pages.find(p => p.id == page2Id) match {
-      case Some(p2) => pages.find(p => p.id == page1Id) match {
-        case Some(p1) => p1.links += p2
-        case None => println("Page (1) " + page1Id + " not found!")
-      }
-      case None => println("Page (2) " + page2Id + " not found!")
-    }
-
-    if (visualizationEnabled) {
-      graph.addEdge(s"$page1Id-$page2Id-${Rand.randInt(1000)}", page1Id, page2Id)
-    }
-  }
+  val users = MHashMap[User, Page]()
+  protected var lastUserId = 0
 
   def visitPage(page: Page) {
-    if (visualizationEnabled) {
-      val node = graph.getNode[Node](page.id)
-      val currSize = node.getAttribute[Double]("ui.size")
-      node.setAttribute("ui.size", Double.box(currSize + 0.05))
-      normalizeSizes()
-    }
-
     visits += (page -> (visits.getOrElse(page, 0l) + 1l))
-  }
-
-  def normalizeSizes(): Unit = {
-    if (visualizationEnabled) {
-      graph.getNodeIterator[Node].foreach(node => {
-        val currSize = node.getAttribute[Double]("ui.size")
-        if (currSize > 10)
-          node.setAttribute("ui.size", Double.box(currSize / 10.0))
-      })
-    }
   }
 
   def addToCart(product: Page): Unit = {
@@ -160,7 +109,9 @@ class Website {
     uniqueUserCount += 1
   }
 
-  def getStats: String = {
+  def newUserId = uniqueUserCount + 1
+
+  override def toString: String = {
     val sb = new StringBuilder()
 
     sb ++= "--- Website statistics ---\n"
@@ -183,141 +134,135 @@ class Website {
 
     sb.toString()
   }
+}
 
-  def displayGraph = if (visualizationEnabled) graph.display()
+class WebsiteStateVisualization(website: Website) extends WebsiteState(website) {
+  protected val graph = {
+    val graph = new MultiGraph("Website", false, true)
+    // graph.addAttribute("ui.quality")
+    // graph.addAttribute("ui.antialias")
+    graph.addAttribute("ui.stylesheet", "node {fill-color: red; size-mode: dyn-size;} edge {fill-color:grey;}")
+
+    website.pages.foreach(page => {
+      val node = graph.addNode[Node](page.id)
+      node.setAttribute("ui.label", page.id)
+      node.setAttribute("ui.size", Double.box(1))
+    })
+
+    website.pages.foreach(page => {
+      page.links.foreach(link => {
+        graph.addEdge[Edge](s"${page.id}-${link.id}-${Rand.randInt(1000)}", page.id, link.id)
+      })
+    })
+
+    graph
+  }
+
+  def display = graph.display()
+
+  override def visitPage(page: Page) = {
+    val node = graph.getNode[Node](page.id)
+    val currSize = node.getAttribute[Double]("ui.size")
+    node.setAttribute("ui.size", Double.box(currSize + 0.05))
+    normalizeSizes()
+
+    def normalizeSizes() {
+      graph.getNodeIterator[Node].foreach(node => {
+        val currSize = node.getAttribute[Double]("ui.size")
+        if (currSize > 10)
+          node.setAttribute("ui.size", Double.box(currSize / 10.0))
+      })
+    }
+
+    super.visitPage(page)
+  }
 }
 
 object Main extends App {
   def loadMongoWebsite(): Website = {
-    val website = new Website
-    website.displayGraph
-
     val mongoClient = MongoClient("mongodb://localhost")
     val database = mongoClient.getDatabase("kugsha")
     //val collection = database.getCollection("atelierdecamisa-pages")
     val collection = database.getCollection("clickfiel-pages")
 
-    // TODO: fix the double iteration over pages
-    collection.find().projection(include("url", "type", "category")).sort(ascending("_id")).results().foreach(doc => {
-      val url = doc.get[BsonString]("url").get.getValue
+    var homepageId: String = null
 
-      val pageType = doc.get[BsonString]("type").map(_.asString().getValue) match {
-        case Some("list") => "_productList"
-        case Some("product") => "_product"
-        case Some("cart") => "_cart"
-        case Some("generic") => "_generic"
-        case _ => " _generic"
-      }
+    val pages: Map[String, (Page, Set[String])] = Map(collection
+      .find()
+      .projection(include("url", "type", "category", "outbound"))
+      .sort(ascending("_id"))
+      .results()
+      .map { doc => {
+        val url = doc.get[BsonString]("url").get.getValue
 
-      val tags: HashSet[String] = doc.get[BsonArray]("category") match {
-        case Some(categories: BsonArray) => HashSet(pageType) ++ categories.getValues.map(_.asString().getValue)
-        case None => HashSet[String](pageType)
-      }
+        if (homepageId == null) homepageId = url
 
-      val page = Page(url, tags)
-      website.addPage(page)
+        val pageType = doc.get[BsonString]("type").map(_.asString().getValue) match {
+          case Some("list") => "_productList"
+          case Some("product") => "_product"
+          case Some("cart") => "_cart"
+          case Some("generic") => "_generic"
+          case Some(t) =>
+            Console.err.println(s"Page $url has unknown type $t")
+            "_generic"
+          case None =>
+            Console.err.println(s"Page $url has no type")
+            " _generic"
+        }
 
-      if (website.homepage == null)
-        website.homepage = page
+        val tags: HashSet[String] = doc.get[BsonArray]("category") match {
+          case Some(categories: BsonArray) => HashSet(pageType) ++ categories.getValues.map(_.asString().getValue)
+          case None => HashSet[String](pageType)
+        }
+
+        val links = doc.get[BsonArray]("outbound").getOrElse(BsonArray()).getValues.map(_.asString().getValue).toSet
+
+        url -> (Page(url, MSet(), tags), links)
+    }} : _*)
+
+    pages.values.foreach(p => {
+      p._2.foreach(l => {
+        pages.get(l) match {
+          case Some(linkPage) => p._1.links += linkPage._1
+          case None => Console.err.println(s"Page ${p._1.id} contains link $l not found")
+        }
+      })
     })
 
-    collection.find().projection(include("url", "outbound")).results().foreach(doc => {
-      val url = doc.get[BsonString]("url").get.getValue
-      for (out <- doc.get[BsonArray]("outbound").get.getValues) {
-        val urlOut = out.asString().getValue
-        website.addLink(url, urlOut)
-      }
-    })
-
-    website
+    Website(pages.map(p => p._2._1).toSet, pages.get(homepageId).get._1)
   }
 
   def loadExampleWebsite(): Website = {
-    val website = new Website
-    website.displayGraph
+    val homepage = Page("homepage", MSet(), Set("_home"))
+    val electronics = Page("electronics", MSet(), Set("electro", "_productList"))
+    val computers = Page("computers", MSet(), Set("electro", "_product"))
+    val lingerie = Page("lingerie", MSet(), Set("cloth", "_product"))
+    val tshirts = Page("tshirts", MSet(), Set("cloth", "_product"))
+    val football = Page("football", MSet(), Set("sports", "football", "_product"))
+    val cloth = Page("cloth", MSet(), Set("cloth", "_productList"))
+    val sports = Page("sports", MSet(), Set("sports", "football", "_productList"))
+    val cart = Page("cart", MSet(), Set("_cart"))
 
-    val homepage = Page("homepage", HashSet("_home"))
-    val electronics = Page("electronics", HashSet("electro", "_productList"))
-    val computers = Page("computers", HashSet("electro", "_product"))
-    val lingerie = Page("lingerie", HashSet("cloth", "_product"))
-    val tshirts = Page("tshirts", HashSet("cloth", "_product"))
-    val football = Page("football", HashSet("sports", "football", "_product"))
-    val cloth = Page("cloth", HashSet("cloth", "_productList"))
-    val sports = Page("sports", HashSet("sports", "football", "_productList"))
-    val cart = Page("cart", HashSet("_cart"))
+    homepage.links += (electronics, cloth, sports, homepage)
+    electronics.links += (computers, homepage, electronics)
+    cloth.links += (tshirts, lingerie, homepage, cloth)
+    sports.links += (football, homepage, sports)
+    computers.links += (cart, homepage, electronics, computers)
+    tshirts.links += (cart, homepage, cloth, lingerie, tshirts)
+    lingerie.links += (cart, homepage, cloth, tshirts, lingerie)
+    football.links += (cart, homepage, sports, football)
 
-    website.homepage = homepage
-
-    website.addLink(homepage, electronics)
-    website.addLink(homepage, cloth)
-    website.addLink(homepage, sports)
-    website.addLink(homepage, homepage)
-
-    website.addLink(electronics, computers)
-    website.addLink(electronics, homepage)
-    website.addLink(electronics, electronics)
-
-    website.addLink(cloth, tshirts)
-    website.addLink(cloth, lingerie)
-    website.addLink(cloth, homepage)
-    website.addLink(cloth, cloth)
-
-    website.addLink(sports, football)
-    website.addLink(sports, homepage)
-    website.addLink(sports, sports)
-
-    website.addLink(computers, cart)
-    website.addLink(computers, homepage)
-    website.addLink(computers, electronics)
-    website.addLink(computers, computers)
-
-    website.addLink(tshirts, cart)
-    website.addLink(tshirts, homepage)
-    website.addLink(tshirts, cloth)
-    website.addLink(tshirts, lingerie)
-    website.addLink(tshirts, tshirts)
-
-    website.addLink(lingerie, cart)
-    website.addLink(lingerie, homepage)
-    website.addLink(lingerie, cloth)
-    website.addLink(lingerie, tshirts)
-    website.addLink(lingerie, lingerie)
-
-    website.addLink(football, cart)
-    website.addLink(football, homepage)
-    website.addLink(football, sports)
-    website.addLink(football, football)
-
-    website
+    Website(Set(homepage, electronics, cloth, sports, computers, tshirts, lingerie, football), homepage)
   }
 
   new Simulation {
     // System.setProperty("org.graphstream.ui.renderer", "org.graphstream.ui.j2dviewer.J2DGraphRenderer")
 
-    val website = Utilities.time("load website") { loadMongoWebsite() }
-
-    val users = mutable.HashMap[User, Page]()
-    var lastUserId = 0
+    val website = Utilities.time("load website") { loadExampleWebsite() }
+    val state = new WebsiteStateVisualization(website)
+    state.display
 
     def newUsers() {
-
-      // val personas = Map(
-      //   Map(
-      //     "cloth" -> 0.3,
-      //     "electro" -> 0.1,
-      //     "sports" -> 0.6,
-      //     ) -> 1.0,
-      //   Map(
-      //     "cloth" -> 0.9,
-      //     "electro" -> 0.1,
-      //     "sports" -> 0.0
-      //   ) -> 1.0,
-      //   Map(
-      //     "cloth" -> 0.2,
-      //     "electro" -> 0.6,
-      //     "sports" -> 0.2
-      //   ) -> 2.0
-      // )
 
       val personas = Map(
         Map(
@@ -326,43 +271,42 @@ object Main extends App {
         ) -> 1.0
       )
 
-      val distribution = Poisson(25)
+      val distribution = Poisson(5)
 
       val newUsers = distribution.draw()
       println(s"New users: $newUsers")
 
       for (i <- 0 until newUsers) {
         // val user = new RandomUser(lastUserId.toString)
-        val user = AffinityUser(lastUserId.toString, RandHelper.choose(personas).draw())
-        lastUserId += 1
-        users.put(user, website.homepage)
-        website.visitPage(website.homepage)
-        website.newUser()
+        val user = AffinityUser(state.newUserId.toString, RandHelper.choose(personas).draw())
+        state.users.put(user, website.homepage)
+        state.visitPage(website.homepage)
+        state.newUser()
       }
     }
 
     def userInjector() {
-      if (currentTime < 100) {
+      if (currentTime < 5) {
         schedule(1) {
           newUsers()
-          users.foreach { case (user: User, page: Page) =>
+          state.users.foreach { case (user: User, page: Page) =>
             val action = user.emitAction(page, website)
             action match {
               case browse: BrowseToAction =>
                 val prevPage = page
                 val nextPage = browse.page
-                users.update(user, nextPage)
-                website.visitPage(nextPage)
-                //println(s"User ${user.id} went from page ${prevPage.id} to ${nextPage.id}")
+                state.users.update(user, nextPage)
+                state.visitPage(nextPage)
+                println(s"User ${user.id} went from page ${prevPage.id} to ${nextPage.id}")
               case addToCart: AddToCartAction =>
-                website.addToCart(addToCart.product)
-                website.visitPage(addToCart.cartPage)
-                website.visitPage(website.homepage)
-                users.update(user, website.homepage)
-                //println(s"User ${user.id} added ${addToCart.product.id} to cart, back to homepage")
+                state.addToCart(addToCart.product)
+                state.visitPage(addToCart.cartPage)
+                state.visitPage(website.homepage)
+                state.users.update(user, website.homepage)
+                println(s"User ${user.id} added ${addToCart.product.id} to cart, back to homepage")
               case exit: ExitAction =>
-                users.remove(user)
-                //println(s"User ${user.id} exited")
+                state.users.remove(user)
+                println(s"User ${user.id} exited")
             }
 
             sleep(0) // animation purposes
@@ -379,7 +323,7 @@ object Main extends App {
 
     run()
 
-    println(website.getStats)
+    println(state.toString)
   }
 
   def sleep(ms: Int = 50) {
