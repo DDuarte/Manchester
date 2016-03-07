@@ -40,16 +40,16 @@ class WebsiteSimulation(website: Website) extends Simulation {
               val nextPage = browse.page
               state.users.update(user, nextPage)
               state.visitPage(nextPage)
-              println(s"User ${user.id} went from page ${prevPage.id} to ${nextPage.id}")
+              //println(s"User ${user.id} went from page ${prevPage.id} to ${nextPage.id}")
             case addToCart: AddToCartAction =>
               state.addToCart(addToCart.product)
               state.visitPage(addToCart.cartPage)
               state.visitPage(website.homepage)
               state.users.update(user, website.homepage)
-              println(s"User ${user.id} added ${addToCart.product.id} to cart, back to homepage")
+              //println(s"User ${user.id} added ${addToCart.product.id} to cart, back to homepage")
             case exit: ExitAction =>
               state.users.remove(user)
-              println(s"User ${user.id} exited")
+              //println(s"User ${user.id} exited")
           }
 
           sleep(0) // animation purposes

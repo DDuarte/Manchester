@@ -103,6 +103,8 @@ object Boot extends App {
 
   var sim = new WebsiteSimulation(website)
   sim.state.display
-  sim.run()
+  Utilities.time("sim run") {
+    sim.run()
+  }
   println(sim.state.toString)
 }
