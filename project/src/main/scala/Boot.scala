@@ -12,13 +12,6 @@ import scala.collection.mutable.{Set => MSet}
 object Boot extends App {
   val config = ConfigFactory.load()
 
-  val pageTypes = WebsitePageTypes(
-    config.getString("types.list"),
-    config.getString("types.product"),
-    config.getString("types.cart"),
-    config.getString("types.generic")
-  )
-
   def loadMongoWebsite(url: String, dbName: String, collectionName: String): Website = {
     val mongoClient = MongoClient(url)
     val database = mongoClient.getDatabase(dbName)
@@ -26,7 +19,7 @@ object Boot extends App {
 
     var homepageId: String = null
 
-    val pages: Map[String, (Page, Set[String])] = Map(collection
+    val pages = Map(collection
       .find()
       .projection(include("url", "type", "category", "outbound"))
       .sort(ascending("_id"))
@@ -37,16 +30,16 @@ object Boot extends App {
         if (homepageId == null) homepageId = url
 
         val pageType = doc.get[BsonString]("type").map(_.asString().getValue) match {
-          case Some("list") => pageTypes.list
-          case Some("product") => pageTypes.product
-          case Some("cart") => pageTypes.cart
-          case Some("generic") => pageTypes.generic
+          case Some(t) if t == config.getString("types.list") => PageTypesTags.list
+          case Some(t) if t == config.getString("types.product") => PageTypesTags.product
+          case Some(t) if t == config.getString("types.cart") => PageTypesTags.cart
+          case Some(t) if t == config.getString("types.generic") => PageTypesTags.generic
           case Some(t) =>
             Console.err.println(s"Page $url has unknown type $t")
-            pageTypes.generic
+            PageTypesTags.generic
           case None =>
             Console.err.println(s"Page $url has no type")
-            pageTypes.generic
+            PageTypesTags.generic
         }
 
         val tags: HashSet[String] = doc.get[BsonArray]("category") match {
@@ -68,19 +61,19 @@ object Boot extends App {
       })
     })
 
-    Website(pages.map(p => p._2._1).toSet, pages.get(homepageId).get._1, pageTypes)
+    Website(pages.map(p => p._2._1).toSet, pages.get(homepageId).get._1)
   }
 
   def loadExampleWebsite(): Website = {
-    val homepage = Page("homepage", MSet(), Set(pageTypes.generic))
-    val electronics = Page("electronics", MSet(), Set("electro", pageTypes.list))
-    val computers = Page("computers", MSet(), Set("electro", pageTypes.product))
-    val lingerie = Page("lingerie", MSet(), Set("cloth", pageTypes.product))
-    val tshirts = Page("tshirts", MSet(), Set("cloth", pageTypes.product))
-    val football = Page("football", MSet(), Set("sports", "football", pageTypes.product))
-    val cloth = Page("cloth", MSet(), Set("cloth", pageTypes.list))
-    val sports = Page("sports", MSet(), Set("sports", "football", pageTypes.list))
-    val cart = Page("cart", MSet(), Set(pageTypes.cart))
+    val homepage = Page("homepage", MSet(), Set(PageTypesTags.generic))
+    val electronics = Page("electronics", MSet(), Set("electro", PageTypesTags.list))
+    val computers = Page("computers", MSet(), Set("electro", PageTypesTags.product))
+    val lingerie = Page("lingerie", MSet(), Set("cloth", PageTypesTags.product))
+    val tshirts = Page("tshirts", MSet(), Set("cloth", PageTypesTags.product))
+    val football = Page("football", MSet(), Set("sports", "football", PageTypesTags.product))
+    val cloth = Page("cloth", MSet(), Set("cloth", PageTypesTags.list))
+    val sports = Page("sports", MSet(), Set("sports", "football", PageTypesTags.list))
+    val cart = Page("cart", MSet(), Set(PageTypesTags.cart))
 
     homepage.links += (electronics, cloth, sports, homepage)
     electronics.links += (computers, homepage, electronics)
@@ -91,7 +84,7 @@ object Boot extends App {
     lingerie.links += (cart, homepage, cloth, tshirts, lingerie)
     football.links += (cart, homepage, sports, football)
 
-    Website(Set(homepage, electronics, cloth, sports, computers, tshirts, lingerie, football), homepage, pageTypes)
+    Website(Set(homepage, electronics, cloth, sports, computers, tshirts, lingerie, football), homepage)
   }
 
   val website = Utilities.time("load website") {

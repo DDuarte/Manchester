@@ -5,7 +5,7 @@ import org.graphstream.graph.implementations._
 import scala.collection.JavaConversions._
 import scala.collection.mutable.{HashMap => MHashMap, Set => MSet}
 
-case class Website(pages: Set[Page], homepage: Page, pageTypes: WebsitePageTypes)
+case class Website(pages: Set[Page], homepage: Page)
 
 case class Page(id: String, links: MSet[Page], tags: Set[String]) {
   def canEqual(other: Any): Boolean = other.isInstanceOf[Page]
@@ -110,8 +110,9 @@ class WebsiteStateVisualization(website: Website) extends WebsiteState(website) 
   }
 }
 
-case class WebsitePageTypes(
-  list: String,
-  product: String,
-  cart: String,
-  generic: String)
+object PageTypesTags {
+  val list = "_productList"
+  val product = "_product"
+  val cart = "_cart"
+  val generic = "_generic"
+}

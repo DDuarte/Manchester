@@ -21,8 +21,8 @@ case class RandomUser(userId: String) extends User(userId) {
   override def emitAction(currentPage: Page, website: Website): Action = {
     if (Rand.randInt(3).draw() == 2 /* 33.3% */ || currentPage.links.isEmpty)
       ExitAction()
-    else if (Rand.randInt(101).draw() <= 5 /* 5% */ && currentPage.tags.contains(website.pageTypes.product)) {
-      val cartPage = currentPage.links.find(l => l.tags.contains(website.pageTypes.cart)).get
+    else if (Rand.randInt(101).draw() <= 5 /* 5% */ && currentPage.tags.contains(PageTypesTags.product)) {
+      val cartPage = currentPage.links.find(l => l.tags.contains(PageTypesTags.cart)).get
       AddToCartAction(currentPage, cartPage)
     } else {
       val nextPage = Rand.choose(currentPage.links).draw()
@@ -35,15 +35,15 @@ case class AffinityUser(userId: String, affinities: Map[String, Double] = Map())
   override def emitAction(currentPage: Page, website: Website): Action = {
     if (Rand.randInt(3).draw() == 2 /* 33.3% */ || currentPage.links.isEmpty)
       ExitAction()
-    else if (Rand.randInt(101).draw() <= 5 /* 5% */ && currentPage.tags.contains(website.pageTypes.product)) {
+    else if (Rand.randInt(101).draw() <= 5 /* 5% */ && currentPage.tags.contains(PageTypesTags.product)) {
       // assumed that a product page links to a cart page
-      val cartPage = currentPage.links.find(l => l.tags.contains(website.pageTypes.cart)).get
+      val cartPage = currentPage.links.find(l => l.tags.contains(PageTypesTags.cart)).get
       AddToCartAction(currentPage, cartPage)
     } else {
       val affSelected = RandHelper.choose(affinities).draw()
 
       val links = currentPage.links.filter(p => p.tags.contains(affSelected) &&
-        (p.tags.contains(website.pageTypes.product) || p.tags.contains(website.pageTypes.list)))
+        (p.tags.contains(PageTypesTags.product) || p.tags.contains(PageTypesTags.list)))
 
       val nextPage = if (links.isEmpty)
         Rand.choose(currentPage.links).draw()
