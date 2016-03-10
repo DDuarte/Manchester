@@ -1,27 +1,21 @@
 import breeze.stats.distributions.Poisson
 
-class WebsiteSimulation(website: Website) extends Simulation {
+class WebsiteSimulation(website: Website, profiles: Map[UserProfile, Double]) extends Simulation {
   // System.setProperty("org.graphstream.ui.renderer", "org.graphstream.ui.j2dviewer.J2DGraphRenderer")
 
   val state = new WebsiteStateVisualization(website)
 
   def newUsers() {
 
-    val personas = Map(
-      Map(
-        "Portáteis" -> 1.0,
-        "HP" -> 1.0
-      ) -> 1.0
-    )
+    val profile = RandHelper.choose(profiles).draw()
 
-    val distribution = Poisson(25)
+    val distribution = profile.arrivalDistribution
 
     val newUsers = distribution.draw()
     println(s"New users: $newUsers")
 
     for (i <- 0 until newUsers) {
-      // val user = new RandomUser(lastUserId.toString)
-      val user = AffinityUser(state.newUserId.toString, RandHelper.choose(personas).draw())
+      val user = AffinityUser(state.newUserId.toString, profile.affinities)
       state.users.put(user, website.homepage)
       state.visitPage(website.homepage)
       state.newUser()

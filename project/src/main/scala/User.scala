@@ -1,4 +1,6 @@
-import breeze.stats.distributions.Rand
+import breeze.stats.distributions.{DiscreteDistr, Rand}
+
+import scala.concurrent.duration.Duration
 
 abstract class User(val id: String) {
   def emitAction(currentPage: Page, website: Website): Action
@@ -54,3 +56,10 @@ case class AffinityUser(userId: String, affinities: Map[String, Double] = Map())
     }
   }
 }
+
+case class UserProfile(
+  affinities: Map[String, Double],
+  pageTypeWeights: Map[String, Double],
+  averageSessionDuration: Duration,
+  arrivalDistribution: DiscreteDistr[Int]
+)

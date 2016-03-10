@@ -1,12 +1,17 @@
+import java.util.concurrent.TimeUnit
+
 import MongoHelpers._
+import breeze.stats.distributions.Poisson
 import com.typesafe.config.ConfigFactory
+import org.bson.{BsonValue, BsonDouble, BsonDocument}
 import org.mongodb.scala.MongoClient
-import org.mongodb.scala.bson.{BsonArray, BsonString}
+import org.mongodb.scala.bson.{BsonInt64, BsonArray, BsonString}
 import org.mongodb.scala.model.Projections._
 import org.mongodb.scala.model.Sorts._
 
 import scala.collection.JavaConversions._
 import scala.collection.mutable.{Set => MSet}
+import scala.concurrent.duration.Duration
 
 object Boot extends App {
   val config = ConfigFactory.load()
@@ -20,31 +25,37 @@ object Boot extends App {
 
     val pages = Map(collection
       .find()
-      .projection(include("url", "type", "category", "outbound"))
+      .projection(include(
+        config.getString("mongodb.collections.pages.id"),
+        config.getString("mongodb.collections.pages.type"),
+        config.getString("mongodb.collections.pages.categories"),
+        config.getString("mongodb.collections.pages.links")))
       .sort(ascending("_id"))
       .results()
       .map { doc => {
-        val url = doc.get[BsonString]("url").get.getValue
+        val id = doc.get[BsonString](config.getString("mongodb.collections.pages.id")).get.getValue
 
-        if (homepageId == null) homepageId = url
+        if (homepageId == null) homepageId = id
 
-        val pageType = doc.get[BsonString]("type").map(_.asString().getValue) match {
+        val pageType = doc.get[BsonString](config.getString("mongodb.collections.pages.type")).map(_.asString().getValue) match {
           case Some(t) if t == config.getString("types.list") => PageTypesTags.list
           case Some(t) if t == config.getString("types.product") => PageTypesTags.product
           case Some(t) if t == config.getString("types.cart") => PageTypesTags.cart
           case Some(t) if t == config.getString("types.generic") => PageTypesTags.generic
           case Some(t) =>
-            Console.err.println(s"Page $url has unknown type $t")
+            Console.err.println(s"Page $id has unknown type $t")
             PageTypesTags.generic
           case None =>
-            Console.err.println(s"Page $url has no type")
+            Console.err.println(s"Page $id has no type")
             PageTypesTags.generic
         }
 
-        val tags: Set[String] = doc.get[BsonArray]("tags").getOrElse(BsonArray()).getValues.map(_.asString().getValue).toSet + pageType
-        val links = doc.get[BsonArray]("outbound").getOrElse(BsonArray()).getValues.map(_.asString().getValue).toSet
+        val tags: Set[String] = doc.get[BsonArray](config.getString("mongodb.collections.pages.categories"))
+          .getOrElse(BsonArray()).getValues.map(_.asString().getValue).toSet + pageType
+        val links = doc.get[BsonArray](config.getString("mongodb.collections.pages.links"))
+          .getOrElse(BsonArray()).getValues.map(_.asString().getValue).toSet
 
-        url -> (Page(url, MSet(), tags), links)
+        id -> (Page(id, MSet(), tags), links)
     }} : _*)
 
     pages.values.foreach(p => {
@@ -57,6 +68,34 @@ object Boot extends App {
     })
 
     Website(pages.map(p => p._2._1).toSet, pages.get(homepageId).get._1)
+  }
+
+  def loadMongoProfiles(url: String, dbName: String, collectionName: String) : Map[UserProfile, Double] = {
+    val mongoClient = MongoClient(url)
+    val database = mongoClient.getDatabase(dbName)
+    val collection = database.getCollection(collectionName)
+
+    Map(collection
+      .find()
+      .projection(include(
+        config.getString("mongodb.collections.profiles.flow"),
+        config.getString("mongodb.collections.profiles.affinities"),
+        config.getString("mongodb.collections.profiles.pageWeights"),
+        config.getString("mongodb.collections.profiles.avgDuration")))
+      .sort(ascending("_id"))
+      .results()
+      .map { doc => {
+        val affinities: Map[String, Double] = Map(doc.get[BsonDocument](config.getString("mongodb.collections.profiles.affinities"))
+          .getOrElse(new BsonDocument()).entrySet.map { e => { e.getKey -> e.getValue.asDouble().getValue }}.toSeq : _*)
+
+        val pageWeights: Map[String, Double] = Map(doc.get[BsonDocument](config.getString("mongodb.collections.profiles.pageWeights"))
+          .getOrElse(new BsonDocument()).entrySet.map { e => { e.getKey -> e.getValue.asDouble().getValue }}.toSeq : _*)
+
+        val duration = Duration(doc.get[BsonInt64](config.getString("mongodb.collections.profiles.avgDuration"))
+          .getOrElse(BsonInt64(0l)).longValue(), TimeUnit.SECONDS)
+
+        UserProfile(affinities, pageWeights, duration, Poisson(25) /* TODO: hardcoded */) -> 1.0 /* TODO: hardcoded */
+      }} : _*)
   }
 
   def loadExampleWebsite(): Website = {
@@ -82,15 +121,48 @@ object Boot extends App {
     Website(Set(homepage, electronics, cloth, sports, computers, tshirts, lingerie, football), homepage)
   }
 
+  def loadExampleProfiles() : Map[UserProfile, Double] = {
+    Map(
+      UserProfile(
+        Map(
+          "cloth" -> 0.5,
+          "sports" -> 0.5
+        ),
+        Map(
+          PageTypesTags.cart -> 0.05,
+          PageTypesTags.product -> 0.5,
+          PageTypesTags.list -> 0.5
+        ),
+        Duration(30, TimeUnit.SECONDS),
+        Poisson(25)
+      ) -> 0.5,
+      UserProfile(
+        Map(
+          "electro" -> 1
+        ),
+        Map(
+          PageTypesTags.cart ->1
+        ),
+        Duration(5, TimeUnit.SECONDS),
+        Poisson(50)
+      ) -> 0.5
+    )
+  }
+
   val website = Utilities.time("load website") {
     loadMongoWebsite(
       config.getString("mongodb.url"),
       config.getString("mongodb.db"),
-      config.getString("mongodb.collection"))
+      config.getString("mongodb.collections.pages.name"))
   }
 
-  var sim = new WebsiteSimulation(website)
-  sim.state.display
+  val profiles = loadMongoProfiles(
+    config.getString("mongodb.url"),
+    config.getString("mongodb.db"),
+    config.getString("mongodb.collections.profiles.name"))
+
+  var sim = new WebsiteSimulation(website, profiles)
+  // sim.state.display
   Utilities.time("sim run") {
     sim.run()
   }
