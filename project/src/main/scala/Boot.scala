@@ -6,7 +6,6 @@ import org.mongodb.scala.model.Projections._
 import org.mongodb.scala.model.Sorts._
 
 import scala.collection.JavaConversions._
-import scala.collection.immutable.HashSet
 import scala.collection.mutable.{Set => MSet}
 
 object Boot extends App {
@@ -42,11 +41,7 @@ object Boot extends App {
             PageTypesTags.generic
         }
 
-        val tags: HashSet[String] = doc.get[BsonArray]("category") match {
-          case Some(categories) => HashSet(pageType) ++ categories.getValues.map(_.asString().getValue)
-          case None => HashSet[String](pageType)
-        }
-
+        val tags: Set[String] = doc.get[BsonArray]("tags").getOrElse(BsonArray()).getValues.map(_.asString().getValue).toSet + pageType
         val links = doc.get[BsonArray]("outbound").getOrElse(BsonArray()).getValues.map(_.asString().getValue).toSet
 
         url -> (Page(url, MSet(), tags), links)
