@@ -1,5 +1,13 @@
 language: scala
 
+scala:
+ - 2.10.6
+ - 2.11.8
+
+jdk:
+  - oraclejdk8
+  - oraclejdk7
+
 script:
   - sbt compile
   - sbt test
