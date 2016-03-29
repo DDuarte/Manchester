@@ -86,10 +86,10 @@ object Boot extends App {
       .results()
       .map { doc => {
         val affinities: Map[String, Double] = Map(doc.get[BsonDocument](config.getString("mongodb.collections.profiles.affinities"))
-          .getOrElse(new BsonDocument()).entrySet.map { e => { e.getKey -> e.getValue.asDouble().getValue }}.toSeq : _*)
+          .getOrElse(new BsonDocument()).entrySet.map { e => { e.getKey -> e.getValue.asNumber().doubleValue() }}.toSeq : _*)
 
         val pageWeights: Map[String, Double] = Map(doc.get[BsonDocument](config.getString("mongodb.collections.profiles.pageWeights"))
-          .getOrElse(new BsonDocument()).entrySet.map { e => { e.getKey -> e.getValue.asDouble().getValue }}.toSeq : _*)
+          .getOrElse(new BsonDocument()).entrySet.map { e => { e.getKey -> e.getValue.asNumber().doubleValue() }}.toSeq : _*)
 
         val duration = Duration(doc.get[BsonInt64](config.getString("mongodb.collections.profiles.avgDuration"))
           .getOrElse(BsonInt64(0l)).longValue(), TimeUnit.SECONDS)
