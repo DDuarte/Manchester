@@ -15,7 +15,7 @@ class WebsiteSimulation(website: Website, profiles: Map[UserProfile, Double]) ex
     println(s"New users: $newUsers")
 
     for (i <- 0 until newUsers) {
-      val user = AffinityUser(state.newUserId.toString, profile.affinities)
+      val user = AffinityUser(state.newUserId.toString, profile)
       state.users.put(user, website.homepage)
       state.visitPage(website.homepage)
       state.newUser()
@@ -23,7 +23,7 @@ class WebsiteSimulation(website: Website, profiles: Map[UserProfile, Double]) ex
   }
 
   def userInjector() {
-    if (currentTime < 100) {
+    if (currentTime < 10) {
       schedule(1) {
         newUsers()
         state.users.foreach { case (user: User, page: Page) =>

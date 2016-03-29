@@ -32,13 +32,11 @@ object Main {
         case Some("kuantokusta") => {
           if (uid.isDefined && event.isDefined && (title.isDefined || prodName.isDefined)) {
 
-            var name = ""
-
-            if (prodName.isDefined) {
-              name = prodName.map(_.replace(",", ";")).get
+            val name = (if (prodName.isDefined) {
+              prodName.map(_.replace(",", ";")).get
             } else {
-              name = title.map(_.stripSuffix(" - Comparador de preços e guia de compras online").replace(",", ";")).get
-            }
+              title.map(_.stripSuffix(" - Comparador de preços e guia de compras online").replace(",", ";")).get
+            })
 
             println(uid.get + "," + name + "," + event.get)
           }

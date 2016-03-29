@@ -94,7 +94,7 @@ object Boot extends App {
         val duration = Duration(doc.get[BsonInt64](config.getString("mongodb.collections.profiles.avgDuration"))
           .getOrElse(BsonInt64(0l)).longValue(), TimeUnit.SECONDS)
 
-        UserProfile(affinities, pageWeights, duration, Poisson(25) /* TODO: hardcoded */) -> 1.0 /* TODO: hardcoded */
+        UserProfile(affinities, pageWeights, duration, Poisson(25), 0.33, 0.05 /* TODO: hardcoded */) -> 1.0 /* TODO: hardcoded */
       }} : _*)
   }
 
@@ -134,7 +134,7 @@ object Boot extends App {
           PageTypesTags.list -> 0.5
         ),
         Duration(30, TimeUnit.SECONDS),
-        Poisson(25)
+        Poisson(25), 0.033, 0.5
       ) -> 0.5,
       UserProfile(
         Map(
@@ -144,7 +144,7 @@ object Boot extends App {
           PageTypesTags.cart ->1
         ),
         Duration(5, TimeUnit.SECONDS),
-        Poisson(50)
+        Poisson(50), 0.033, 0.5
       ) -> 0.5
     )
   }
