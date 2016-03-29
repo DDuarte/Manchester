@@ -24,7 +24,7 @@ case class Page(id: String, links: MSet[Page], tags: Set[String]) {
 
 class WebsiteState(website: Website) {
   protected val visits = MHashMap[Page, Long]()
-  protected val purchases = MHashMap[Page /* Product */, Long]()
+  protected val purchases = MHashMap[Page /* Product */ , Long]()
   protected var uniqueUserCount = 0l
   val users = MHashMap[User, Page]()
   protected var lastUserId = 0

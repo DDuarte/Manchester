@@ -9,12 +9,13 @@ import org.apache.spark.mllib.recommendation.MatrixFactorizationModel
 import org.apache.spark.rdd.RDD
 
 class ALSModel(
-                override val rank: Int,
-                override val userFeatures: RDD[(Int, Array[Double])],
-                override val productFeatures: RDD[(Int, Array[Double])],
-                val userStringIntMap: BiMap[String, Int],
-                val itemStringIntMap: BiMap[String, Int])
-  extends MatrixFactorizationModel(rank, userFeatures, productFeatures) {
+  override val rank:            Int,
+  override val userFeatures:    RDD[(Int, Array[Double])],
+  override val productFeatures: RDD[(Int, Array[Double])],
+  val userStringIntMap:         BiMap[String, Int],
+  val itemStringIntMap:         BiMap[String, Int]
+)
+    extends MatrixFactorizationModel(rank, userFeatures, productFeatures) {
 
   def save(id: String, params: ALSAlgorithmParams,
            sc: SparkContext): Boolean = {
@@ -51,6 +52,7 @@ object ALSModel {
       userStringIntMap = sc.get
         .objectFile[BiMap[String, Int]](s"/tmp/${id}/userStringIntMap").first,
       itemStringIntMap = sc.get
-        .objectFile[BiMap[String, Int]](s"/tmp/${id}/itemStringIntMap").first)
+        .objectFile[BiMap[String, Int]](s"/tmp/${id}/itemStringIntMap").first
+    )
   }
 }

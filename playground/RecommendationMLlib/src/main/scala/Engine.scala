@@ -1,18 +1,18 @@
 import org.apache.spark.{SparkConf, SparkContext}
 
 case class Query(
-                  user: String,
-                  num: Int
-                ) extends Serializable
+  user: String,
+  num:  Int
+) extends Serializable
 
 case class PredictedResult(
-                            itemScores: Array[ItemScore]
-                          ) extends Serializable
+  itemScores: Array[ItemScore]
+) extends Serializable
 
 case class ItemScore(
-                      item: String,
-                      score: Double
-                    ) extends Serializable
+  item:  String,
+  score: Double
+) extends Serializable
 
 object RecommendationExample {
   def main(args: Array[String]): Unit = {

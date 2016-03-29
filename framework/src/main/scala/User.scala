@@ -58,10 +58,10 @@ case class AffinityUser(userId: String, profile: UserProfile) extends User(userI
 }
 
 case class UserProfile(
-  affinities: Map[String, Double],
-  pageTypeWeights: Map[String, Double],
+  affinities:             Map[String, Double],
+  pageTypeWeights:        Map[String, Double],
   averageSessionDuration: Duration,
-  arrivalDistribution: DiscreteDistr[Int],
-  addToCartProb: Double,
-  exitProb: Double
+  arrivalDistribution:    DiscreteDistr[Int],
+  addToCartProb:          Double,
+  exitProb:               Double
 )

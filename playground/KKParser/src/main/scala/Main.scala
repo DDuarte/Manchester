@@ -5,8 +5,6 @@ import org.json4s.native.JsonMethods._
 import scala.collection.immutable.HashSet
 import scala.collection.mutable
 
-
-
 object Main {
   def main(args: Array[String]) {
 
@@ -15,7 +13,6 @@ object Main {
     val path = "E:\\dump-20151020-20151028.log"
 
     val events = mutable.HashSet[String]()
-
 
     for (line <- Source.fromFile(path, "UTF-8").getLines()) {
       val json = parse(line)

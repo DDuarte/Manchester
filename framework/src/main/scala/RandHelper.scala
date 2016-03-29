@@ -2,7 +2,7 @@ import breeze.linalg.DenseVector
 import breeze.stats.distributions.{Multinomial, Rand}
 
 object RandHelper {
-  def choose[T](weightsMap: Map[T, Double]) : Rand[T] = new Rand[T] {
+  def choose[T](weightsMap: Map[T, Double]): Rand[T] = new Rand[T] {
     def draw() = {
       require(weightsMap.nonEmpty, "map cannot be empty")
 
