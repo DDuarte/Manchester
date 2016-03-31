@@ -1,3 +1,5 @@
+import java.text.DecimalFormat
+
 import breeze.stats.distributions.Rand
 import org.graphstream.graph._
 import org.graphstream.graph.implementations._
@@ -24,21 +26,37 @@ case class Page(id: String, links: MSet[Page], tags: Set[String]) {
 
 class WebsiteState(website: Website) {
   protected val visits = MHashMap[Page, Long]()
+  protected val visitsPerUser = MHashMap[User, Long]()
   protected val purchases = MHashMap[Page /* Product */ , Long]()
   protected var uniqueUserCount = 0l
   val users = MHashMap[User, Page]()
-  protected var lastUserId = 0
+  protected var lastUserId = 0l
 
-  def visitPage(page: Page) {
+  protected var singleSessionCount = 0l
+  protected var sessionCount = 0l
+  protected def bounceRate = singleSessionCount.toDouble / sessionCount
+
+  def visitPage(user: User, page: Page) {
+    users.put(user, page)
     visits += (page -> (visits.getOrElse(page, 0l) + 1l))
+    visitsPerUser += (user -> (visitsPerUser.getOrElse(user, 0l) + 1l))
   }
 
   def addToCart(product: Page): Unit = {
     purchases += (product -> (purchases.getOrElse(product, 0l) + 1l))
   }
 
+  def exit(user: User): Unit = {
+    users.remove(user)
+
+    if (visitsPerUser.getOrElse(user, 0l) == 1) {
+      singleSessionCount += 1
+    }
+  }
+
   def newUser() = {
     uniqueUserCount += 1
+    sessionCount += 1
   }
 
   def newUserId = uniqueUserCount + 1
@@ -50,12 +68,22 @@ class WebsiteState(website: Website) {
 
     sb ++= "\n- Unique users: " ++= uniqueUserCount.toString ++= "\n"
 
+    val decFormat = new DecimalFormat("#.###")
+    sb ++= "\n- Bounce rate: " ++= decFormat.format(bounceRate * 100) ++= "%\n"
+
     sb ++= "\n- Visits:\n"
 
     visits.toSeq.sortWith(_._2 > _._2).foreach {
       case (page, count) =>
         sb ++= f"${page.id}%15s $count%5d\n"
     }
+
+    /*sb ++= "\n- Visits per user:\n"
+
+    visitsPerUser.toSeq.sortWith(_._2 > _._2).foreach {
+      case (user, count) =>
+        sb ++= f"${user.id}%15s $count%5d\n"
+    }*/
 
     sb ++= "\n- Purchases:\n"
 
@@ -92,7 +120,9 @@ class WebsiteStateVisualization(website: Website) extends WebsiteState(website) 
 
   def display = graph.display()
 
-  override def visitPage(page: Page) = {
+  override def visitPage(user: User, page: Page) = {
+    super.visitPage(user, page)
+
     val node = graph.getNode[Node](page.id)
     val currSize = node.getAttribute[Double]("ui.size")
     node.setAttribute("ui.size", Double.box(currSize + 0.05))
@@ -105,8 +135,6 @@ class WebsiteStateVisualization(website: Website) extends WebsiteState(website) 
           node.setAttribute("ui.size", Double.box(currSize / 10.0))
       })
     }
-
-    super.visitPage(page)
   }
 }
 

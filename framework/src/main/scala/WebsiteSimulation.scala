@@ -16,8 +16,7 @@ class WebsiteSimulation(website: Website, profiles: Map[UserProfile, Double]) ex
 
     for (i <- 0 until newUsers) {
       val user = AffinityUser(state.newUserId.toString, profile)
-      state.users.put(user, website.homepage)
-      state.visitPage(website.homepage)
+      state.visitPage(user, website.homepage)
       state.newUser()
     }
   }
@@ -33,17 +32,15 @@ class WebsiteSimulation(website: Website, profiles: Map[UserProfile, Double]) ex
               case browse: BrowseToAction =>
                 val prevPage = page
                 val nextPage = browse.page
-                state.users.update(user, nextPage)
-                state.visitPage(nextPage)
+                state.visitPage(user, nextPage)
               //println(s"User ${user.id} went from page ${prevPage.id} to ${nextPage.id}")
               case addToCart: AddToCartAction =>
                 state.addToCart(addToCart.product)
-                state.visitPage(addToCart.cartPage)
-                state.visitPage(website.homepage)
-                state.users.update(user, website.homepage)
+                state.visitPage(user, addToCart.cartPage)
+                state.visitPage(user, website.homepage)
               //println(s"User ${user.id} added ${addToCart.product.id} to cart, back to homepage")
               case exit: ExitAction =>
-                state.users.remove(user)
+                state.exit(user)
               //println(s"User ${user.id} exited")
             }
 
