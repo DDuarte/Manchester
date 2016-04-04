@@ -14,8 +14,9 @@ lazy val commonSettings = Seq(
   organization := "eu.shiftforward",
   version := "0.0.1",
   scalaVersion := "2.11.8",
-  scalacOptions := Seq("-unchecked", "-deprecation", "-encoding", "utf8")
-) ++ formattingSettings
+  scalacOptions := Seq("-unchecked", "-deprecation", "-encoding", "utf8"),
+  shellPrompt := { s => Project.extract(s).currentProject.id + " > " }
+) ++ formattingSettings ++ Revolver.settings
 
 resolvers ++= Seq(
   "Sonatype Releases" at "https://oss.sonatype.org/content/repositories/releases/",
