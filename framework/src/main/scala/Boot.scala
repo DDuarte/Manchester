@@ -99,7 +99,7 @@ object Boot extends App {
           val duration = Duration(doc.get[BsonInt64](config.getString("mongodb.collections.profiles.avgDuration"))
             .getOrElse(BsonInt64(0l)).longValue(), TimeUnit.SECONDS)
 
-          UserProfile(affinities, pageWeights, duration, Poisson(25), 0.33, 0.05 /* TODO: hardcoded */ ) -> 1.0 /* TODO: hardcoded */
+          UserProfile(affinities, pageWeights, duration, Poisson(25), 0.33, 0.90 /* TODO: hardcoded */ ) -> 1.0 /* TODO: hardcoded */
         }
       }: _*)
   }
@@ -174,5 +174,5 @@ object Boot extends App {
   Utilities.time("sim run") {
     sim.run()
   }
-  println(sim.state.toString)
+  println(sim.state.toJson)
 }

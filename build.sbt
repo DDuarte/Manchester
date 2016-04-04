@@ -34,7 +34,8 @@ lazy val manchester = (project in file("framework")).
       "org.graphstream" % "gs-core" % "1.3",
       "org.graphstream" % "gs-ui" % "1.3",
       "org.mongodb.scala" %% "mongo-scala-driver" % "1.1.0",
-      "com.typesafe" % "config" % "1.3.0"
+      "com.typesafe" % "config" % "1.3.0",
+      "org.json4s" %% "json4s-native" % "3.3.0"
     ),
     fork in run := true // required for GraphStream visualizer http://stackoverflow.com/questions/21464673/sbt-trapexitsecurityexception-thrown-at-sbt-run
   )

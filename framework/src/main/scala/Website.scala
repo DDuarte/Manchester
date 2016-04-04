@@ -5,6 +5,7 @@ import org.graphstream.graph._
 import org.graphstream.graph.implementations._
 
 import scala.collection.JavaConversions._
+import scala.collection.immutable.ListMap
 import scala.collection.mutable.{HashMap => MHashMap, Set => MSet}
 
 case class Website(pages: Set[Page], homepage: Page)
@@ -93,6 +94,28 @@ class WebsiteState(website: Website) {
     }
 
     sb.toString()
+  }
+
+  def toJson: String = {
+    import org.json4s._
+    import org.json4s.JsonDSL._
+    import org.json4s.native.JsonMethods._
+
+    val json =
+      ("uniqueUsers" -> uniqueUserCount) ~
+        ("bounceRate" -> bounceRate) ~
+        ("visits" ->
+          ListMap(visits.toSeq.sortWith(_._2 > _._2).map {
+            case (page, count) =>
+              page.id -> count
+          }: _*)) ~
+          ("purchases" ->
+            ListMap(purchases.toSeq.sortWith(_._2 > _._2).map {
+              case (product, count) =>
+                product.id -> count
+            }: _*))
+
+    pretty(render(json))
   }
 }
 
