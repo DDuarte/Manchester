@@ -6,7 +6,7 @@ import org.graphstream.graph.implementations._
 
 import scala.collection.JavaConversions._
 import scala.collection.immutable.ListMap
-import scala.collection.mutable.{HashMap => MHashMap, Set => MSet}
+import scala.collection.mutable.{HashMap => MHashMap, Map => MMap, Set => MSet}
 
 case class Website(pages: Set[Page], homepage: Page)
 
@@ -28,6 +28,8 @@ case class Page(id: String, links: MSet[Page], tags: Set[String]) {
 class WebsiteState(website: Website) {
   protected val visits = MHashMap[Page, Long]()
   protected val visitsPerUser = MHashMap[User, Long]()
+  protected val visitsPerCategory =
+    MMap[String, MMap[String, Long]]().withDefaultValue(MMap[String, Long]().withDefaultValue(0l))
   protected val purchases = MHashMap[Page /* Product */ , Long]()
   protected var uniqueUserCount = 0l
   val users = MHashMap[User, Page]()
@@ -41,6 +43,16 @@ class WebsiteState(website: Website) {
     users.put(user, page)
     visits += (page -> (visits.getOrElse(page, 0l) + 1l))
     visitsPerUser += (user -> (visitsPerUser.getOrElse(user, 0l) + 1l))
+
+    val tagList = page.tags.filter(t => !t.startsWith("_"))
+
+    if (tagList.nonEmpty) {
+      val firstTag = tagList.head
+      val otherTags = tagList.drop(1).mkString(",")
+
+      visitsPerCategory.getOrElseUpdate(firstTag, MMap[String, Long]()) +=
+        (otherTags -> (visitsPerCategory.get(firstTag).get.getOrElseUpdate(otherTags, 0l) + 1l))
+    }
   }
 
   def addToCart(product: Page): Unit = {
@@ -97,22 +109,25 @@ class WebsiteState(website: Website) {
   }
 
   def toJson: String = {
-    import org.json4s._
     import org.json4s.JsonDSL._
     import org.json4s.native.JsonMethods._
 
     val json =
-      ("uniqueUsers" -> uniqueUserCount) ~
+      ("name" -> "Simulation") ~
+        ("uniqueUsers" -> uniqueUserCount) ~
         ("bounceRate" -> bounceRate) ~
         ("visits" ->
           ListMap(visits.toSeq.sortWith(_._2 > _._2).map {
             case (page, count) =>
-              page.id -> count
+              page.id.replace('.', '_') -> count
           }: _*)) ~
+          ("visitsPerCategory" -> visitsPerCategory.map { s =>
+            s._1 -> s._2.toMap
+          }.toMap) ~
           ("purchases" ->
             ListMap(purchases.toSeq.sortWith(_._2 > _._2).map {
               case (product, count) =>
-                product.id -> count
+                product.id.replace('.', '_') -> count
             }: _*))
 
     pretty(render(json))

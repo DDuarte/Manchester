@@ -5,6 +5,7 @@ import breeze.stats.distributions.Poisson
 import com.typesafe.config.ConfigFactory
 import org.bson.BsonDocument
 import org.mongodb.scala.MongoClient
+import org.mongodb.scala.bson.collection.immutable.Document
 import org.mongodb.scala.bson.{BsonArray, BsonInt64, BsonString}
 import org.mongodb.scala.model.Projections._
 import org.mongodb.scala.model.Sorts._
@@ -99,7 +100,7 @@ object Boot extends App {
           val duration = Duration(doc.get[BsonInt64](config.getString("mongodb.collections.profiles.avgDuration"))
             .getOrElse(BsonInt64(0l)).longValue(), TimeUnit.SECONDS)
 
-          UserProfile(affinities, pageWeights, duration, Poisson(25), 0.33, 0.90 /* TODO: hardcoded */ ) -> 1.0 /* TODO: hardcoded */
+          UserProfile(affinities, pageWeights, duration, Poisson(250), 0.33, 0.15 /* TODO: hardcoded */ ) -> 1.0 /* TODO: hardcoded */
         }
       }: _*)
   }
@@ -174,5 +175,14 @@ object Boot extends App {
   Utilities.time("sim run") {
     sim.run()
   }
-  println(sim.state.toJson)
+
+  val json = sim.state.toJson
+  println(json)
+
+  val mongoClient = MongoClient(config.getString("mongodb.url"))
+  val database = mongoClient.getDatabase(config.getString("mongodb.db"))
+  val collection = database.getCollection("simulations")
+
+  val doc = Document(json)
+  collection.insertOne(doc).printResults()
 }
