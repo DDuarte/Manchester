@@ -1,0 +1,28 @@
+@(simulations: List[Simulation])
+
+@main("Simulations") {
+    <h1 class="page-header">Simulations</h1>
+
+    <table class="display table table-striped datatable" cellspacing="0">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+            </tr>
+        </thead>
+        <tfoot>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+            </tr>
+        </tfoot>
+        <tbody>
+            @for(sim <- simulations) {
+                <tr>
+                    <td><a href="@routes.SimulationController.simulations(sim._id)">@sim._id</a></td>
+                    <td>@sim.name</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

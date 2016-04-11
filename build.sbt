@@ -20,7 +20,8 @@ lazy val commonSettings = Seq(
 
 resolvers ++= Seq(
   "Sonatype Releases" at "https://oss.sonatype.org/content/repositories/releases/",
-  "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
+  "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots",
+  "Typesafe repository" at "http://repo.typesafe.com/typesafe/releases/"
 )
 
 lazy val manchester = (project in file("framework")).
@@ -38,6 +39,20 @@ lazy val manchester = (project in file("framework")).
       "org.json4s" %% "json4s-native" % "3.3.0"
     ),
     fork in run := true // required for GraphStream visualizer http://stackoverflow.com/questions/21464673/sbt-trapexitsecurityexception-thrown-at-sbt-run
+  )
+
+lazy val frontend = (project in file("frontend")).enablePlugins(PlayScala).
+  settings(commonSettings: _*).
+  settings(
+    name := "frontend",
+    routesGenerator := InjectedRoutesGenerator,
+    libraryDependencies ++= Seq(
+      jdbc,
+      cache,
+      ws,
+      "org.scalatestplus.play" %% "scalatestplus-play" % "1.5.0-RC1" % Test,
+      "com.github.jeroenr" %% "tepkin" % "0.7"
+    )
   )
 
 lazy val kkparser = (project in file("playground/KKParser")).
@@ -59,4 +74,4 @@ lazy val recommendationmllib = (project in file("playground/RecommendationMLlib"
     )
   )
 
-lazy val root = (project in file(".")).aggregate(manchester, kkparser, recommendationmllib)
+lazy val root = (project in file(".")).aggregate(manchester, frontend, kkparser, recommendationmllib)

@@ -1,0 +1,65 @@
+@(simulation: Simulation)
+
+@main("Simulations") {
+    <h1 class="page-header">@simulation.name <small>@simulation._id</small></h1>
+
+    <h2 class="sub-header">General</h2>
+
+    <dl class="dl-horizontal">
+        <dt>Unique users</dt><dd>@simulation.uniqueUsers</dd>
+        <dt>Bounce rate</dt><dd>@((simulation.bounceRate * 100.0).formatted("%.2f"))%</dd>
+    </dl>
+
+
+    <div class="row">
+
+        <div class="table-responsive col-md-6">
+            <h2 class="sub-header">Visits</h2>
+            <table class="display table table-striped datatable" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>Page</th>
+                        <th>Count</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @for((key, value) <- simulation.visits) {
+                    <tr>
+                        <td>@key</td>
+                        <td>@value</td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="table-responsive col-md-6">
+            <h2 class="sub-header">Purchases</h2>
+
+            <table class="display table table-striped datatable" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Count</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @for((key, value) <- simulation.purchases) {
+                    <tr>
+                        <td>@key</td>
+                        <td>@value</td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="row">
+        <h2 class="sub-header">Visits per Category</h2>
+
+        <div class="col-md-12" id="visitsPerCategoryContainer">
+
+        </div>
+    </div>
+}
