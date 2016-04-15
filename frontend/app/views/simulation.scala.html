@@ -1,6 +1,13 @@
 @(simulation: Simulation)
 
-@main("Simulations") {
+@scripts = {
+    <script type="text/javascript" src="https://code.highcharts.com/highcharts.js"></script>
+    <script type="text/javascript" src="https://code.highcharts.com/modules/data.js"></script>
+    <script type="text/javascript" src="https://code.highcharts.com/modules/drilldown.js"></script>
+    <script type="text/javascript" src=@routes.Assets.versioned("js/simulation.js")></script>
+}
+
+@main("Simulations", scripts) {
     <h1 class="page-header">@simulation.name <small>@simulation._id</small></h1>
 
     <h2 class="sub-header">General</h2>
