@@ -2,24 +2,12 @@ import breeze.stats.distributions.{DiscreteDistr, Rand}
 
 import scala.concurrent.duration.Duration
 
-abstract class User(val id: String) {
+trait User {
   def emitAction(currentPage: Page, website: Website): Action
-
-  def canEqual(other: Any): Boolean = other.isInstanceOf[User]
-
-  override def equals(other: Any): Boolean = other match {
-    case that: User =>
-      (that canEqual this) &&
-        id == that.id
-    case _ => false
-  }
-
-  override def hashCode(): Int = {
-    id.hashCode
-  }
+  def id: String
 }
 
-case class RandomUser(userId: String) extends User(userId) {
+case class RandomUser(id: String) extends User {
   override def emitAction(currentPage: Page, website: Website): Action = {
     if (Rand.randInt(3).draw() == 2 /* 33.3% */ || currentPage.links.isEmpty)
       ExitAction()
@@ -33,7 +21,7 @@ case class RandomUser(userId: String) extends User(userId) {
   }
 }
 
-case class AffinityUser(userId: String, profile: UserProfile) extends User(userId) {
+case class AffinityUser(id: String, profile: UserProfile) extends User {
   override def emitAction(currentPage: Page, website: Website): Action = {
     if ((Rand.randInt(101).draw() < profile.exitProb * 100) || currentPage.links.isEmpty)
       ExitAction()
