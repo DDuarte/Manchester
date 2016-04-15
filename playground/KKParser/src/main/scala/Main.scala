@@ -10,7 +10,9 @@ object Main {
 
     implicit val formats = DefaultFormats
 
-    val path = "E:\\dump-20151020-20151028.log"
+    // val path = "E:\\dump-20151020-20151028.log"
+    //val path = "E:\\dump-20151001-20151010.log"
+    val path = "E:\\dump-20151010-20151020.log"
 
     val events = mutable.HashSet[String]()
 
@@ -27,16 +29,21 @@ object Main {
 
       clientId match {
         case Some("kuantokusta") => {
-          if (uid.isDefined && event.isDefined && (title.isDefined || prodName.isDefined)) {
 
-            val name = (if (prodName.isDefined) {
+          if (t.getOrElse("") == "pageView" && events.add(pageType.getOrElse(""))) {
+            println(pageType + " - " + line)
+          }
+
+          /* if (uid.isDefined && event.isDefined && (title.isDefined || prodName.isDefined)) {
+
+            val name = if (prodName.isDefined) {
               prodName.map(_.replace(",", ";")).get
             } else {
               title.map(_.stripSuffix(" - Comparador de preços e guia de compras online").replace(",", ";")).get
-            })
+            }
 
             println(uid.get + "," + name + "," + event.get)
-          }
+          }*/
         }
         case _ =>
       }

@@ -74,4 +74,14 @@ lazy val recommendationmllib = (project in file("playground/RecommendationMLlib"
     )
   )
 
-lazy val root = (project in file(".")).aggregate(manchester, frontend, kkparser, recommendationmllib)
+lazy val GephiWebsiteGraph = (project in file("playground/GephiWebsiteGraph")).
+  settings(commonSettings: _*).
+  settings(
+    name := "GephiWebsiteGraph",
+    libraryDependencies ++= Seq(
+      "org.mongodb.scala" %% "mongo-scala-driver" % "1.1.0"
+    )
+  )
+
+lazy val root = (project in file(".")).aggregate(manchester, frontend,
+  kkparser, recommendationmllib, GephiWebsiteGraph)
