@@ -122,7 +122,7 @@ class WebsiteState(website: Website) {
               page.id.replace('.', '_') -> count
           }: _*)) ~
           ("visitsPerCategory" -> visitsPerCategory.map { s =>
-            s._1 -> s._2.toMap
+            s._1.replace('.', '_') -> s._2.map { ss => ss._1.replace('.', '_') -> ss._2 }.toMap
           }.toMap) ~
           ("purchases" ->
             ListMap(purchases.toSeq.sortWith(_._2 > _._2).map {
