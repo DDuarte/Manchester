@@ -2,6 +2,42 @@ import breeze.stats.distributions.{DiscreteDistr, Rand}
 
 import scala.concurrent.duration.Duration
 
+trait UserFactory[+T] {
+  def users: Iterator[List[T]]
+  def getNewUserId: String
+}
+
+case class AffinityFactory(profiles: Map[UserProfile, Double]) extends UserFactory[AffinityUser] {
+
+  private var count = 0l
+  def getNewUserId = {
+    count += 1
+    count.toString
+  }
+
+  val users: Iterator[List[AffinityUser]] = {
+    Iterator.continually({
+      val profile = RandHelper.choose(profiles).draw()
+      val distribution = profile.arrivalDistribution
+      val newUsers = distribution.draw()
+
+      List.fill(newUsers)(AffinityUser(getNewUserId, profile))
+    })
+  }
+}
+
+case class RandomFactory() extends UserFactory[RandomUser] {
+
+  private var count = 0l
+  def getNewUserId: String = {
+    (count += 1).toString
+  }
+
+  val users: Iterator[List[RandomUser]] = {
+    Iterator.continually(List.fill(25)(RandomUser(getNewUserId)))
+  }
+}
+
 trait User {
   def emitAction(currentPage: Page, website: Website): Action
   def id: String

@@ -170,7 +170,7 @@ object Boot extends App {
     config.getString("mongodb.collections.profiles.name")
   )
 
-  var sim = new WebsiteSimulation(website, profiles)
+  var sim = new WebsiteSimulation(website, AffinityFactory(profiles), DummyWebsiteAgent())
   // sim.state.display
   Utilities.time("sim run") {
     sim.run()

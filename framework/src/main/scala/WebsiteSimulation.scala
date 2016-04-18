@@ -1,23 +1,19 @@
 
 
-class WebsiteSimulation(website: Website, profiles: Map[UserProfile, Double]) extends Simulation {
+class WebsiteSimulation(website: Website, userFactory: UserFactory[User], websiteAgent: WebsiteAgent) extends Simulation {
   // System.setProperty("org.graphstream.ui.renderer", "org.graphstream.ui.j2dviewer.J2DGraphRenderer")
 
   val state = new WebsiteStateVisualization(website)
 
   def newUsers() {
 
-    val profile = RandHelper.choose(profiles).draw()
+    val newUsers = userFactory.users.next()
+    println(s"New users: ${newUsers.length}")
 
-    val distribution = profile.arrivalDistribution
-
-    val newUsers = distribution.draw()
-    println(s"New users: $newUsers")
-
-    for (i <- 0 until newUsers) {
-      val user = AffinityUser(state.newUserId.toString, profile)
-      state.visitPage(user, website.homepage)
+    for (user <- newUsers) {
       state.newUser()
+      websiteAgent.notifyUserAction(user, None, BrowseToAction(website.homepage))
+      state.visitPage(user, websiteAgent.modifyPage(website.homepage, user))
     }
   }
 
@@ -28,16 +24,17 @@ class WebsiteSimulation(website: Website, profiles: Map[UserProfile, Double]) ex
         state.users.foreach {
           case (user: User, page: Page) =>
             val action = user.emitAction(page, website)
+            websiteAgent.notifyUserAction(user, Some(page), action)
             action match {
               case browse: BrowseToAction =>
                 val prevPage = page
                 val nextPage = browse.page
-                state.visitPage(user, nextPage)
+                state.visitPage(user, websiteAgent.modifyPage(nextPage, user))
               //println(s"User ${user.id} went from page ${prevPage.id} to ${nextPage.id}")
               case addToCart: AddToCartAction =>
                 state.addToCart(addToCart.product)
-                state.visitPage(user, addToCart.cartPage)
-                state.visitPage(user, website.homepage)
+                state.visitPage(user, websiteAgent.modifyPage(addToCart.cartPage, user))
+                state.visitPage(user, websiteAgent.modifyPage(website.homepage, user))
               //println(s"User ${user.id} added ${addToCart.product.id} to cart, back to homepage")
               case exit: ExitAction =>
                 state.exit(user)

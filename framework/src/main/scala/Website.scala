@@ -33,7 +33,6 @@ class WebsiteState(website: Website) {
   protected val purchases = MHashMap[Page /* Product */ , Long]()
   protected var uniqueUserCount = 0l
   val users = MHashMap[User, Page]()
-  protected var lastUserId = 0l
 
   protected var singleSessionCount = 0l
   protected var sessionCount = 0l
@@ -71,8 +70,6 @@ class WebsiteState(website: Website) {
     uniqueUserCount += 1
     sessionCount += 1
   }
-
-  def newUserId = uniqueUserCount + 1
 
   override def toString: String = {
     val sb = new StringBuilder()
