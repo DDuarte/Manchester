@@ -30,7 +30,8 @@ case class RandomFactory() extends UserFactory[RandomUser] {
 
   private var count = 0l
   def getNewUserId: String = {
-    (count += 1).toString
+    count += 1
+    count.toString
   }
 
   val users: Iterator[List[RandomUser]] = {
