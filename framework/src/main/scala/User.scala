@@ -9,11 +9,7 @@ trait UserFactory[+T] {
 
 case class AffinityFactory(profiles: Map[UserProfile, Double]) extends UserFactory[AffinityUser] {
 
-  private var count = 0l
-  def getNewUserId = {
-    count += 1
-    count.toString
-  }
+  def getNewUserId: String = java.util.UUID.randomUUID().toString
 
   val users: Iterator[List[AffinityUser]] = {
     Iterator.continually({
@@ -28,11 +24,7 @@ case class AffinityFactory(profiles: Map[UserProfile, Double]) extends UserFacto
 
 case class RandomFactory() extends UserFactory[RandomUser] {
 
-  private var count = 0l
-  def getNewUserId: String = {
-    count += 1
-    count.toString
-  }
+  def getNewUserId: String = java.util.UUID.randomUUID().toString
 
   val users: Iterator[List[RandomUser]] = {
     Iterator.continually(List.fill(25)(RandomUser(getNewUserId)))
