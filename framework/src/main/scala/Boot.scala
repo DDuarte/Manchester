@@ -128,10 +128,5 @@ object Boot extends App {
   val json = sim.state.toJson
   println(json)
 
-  val mongoClient = MongoClient(config.getString("mongodb.url"))
-  val database = mongoClient.getDatabase(config.getString("mongodb.db"))
-  val collection = database.getCollection("simulations")
-
-  val doc = Document(json)
-  collection.insertOne(doc).printResults()
+  sim.state.saveToDb
 }

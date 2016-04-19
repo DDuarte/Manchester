@@ -71,4 +71,7 @@ object Main extends App {
   Utilities.time("sim run") {
     sim.run()
   }
+
+  println(sim.state)
+  sim.state.saveToDb
 }

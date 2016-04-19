@@ -1,7 +1,12 @@
 import java.text.DecimalFormat
 
+import com.typesafe.config.ConfigFactory
+import org.mongodb.scala.bson.collection.immutable.Document
+import org.mongodb.scala.{Completed, MongoClient}
+
 import scala.collection.immutable.ListMap
 import scala.collection.mutable.{HashMap => MHashMap, Map => MMap, Set => MSet}
+import scala.concurrent.Future
 
 case class Website(pages: Set[Page], homepage: Page)
 
@@ -125,6 +130,18 @@ class WebsiteState(website: Website) {
             }: _*))
 
     pretty(render(json))
+  }
+
+  def saveToDb: Future[Seq[Completed]] = {
+    // TODO: atm this only supports mongodb backend
+
+    val config = ConfigFactory.load()
+
+    val mongoClient = MongoClient(config.getString("mongodb.url"))
+    val database = mongoClient.getDatabase(config.getString("mongodb.db"))
+    val collection = database.getCollection("simulations")
+
+    collection.insertOne(Document(toJson)).toFuture()
   }
 }
 
