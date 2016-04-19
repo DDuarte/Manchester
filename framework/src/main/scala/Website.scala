@@ -10,7 +10,7 @@ import scala.concurrent.Future
 
 case class Website(pages: Set[Page], homepage: Page)
 
-case class Page(id: String, links: MSet[Page], tags: Set[String]) {
+class Page(val id: String, val links: MSet[Page], val tags: Set[String]) {
   def canEqual(other: Any): Boolean = other.isInstanceOf[Page]
 
   override def equals(other: Any): Boolean = other match {
@@ -23,6 +23,10 @@ case class Page(id: String, links: MSet[Page], tags: Set[String]) {
   override def hashCode(): Int = {
     id.hashCode
   }
+}
+
+object Page {
+  def apply(id: String, links: MSet[Page], tags: Set[String]) = new Page(id, links, tags)
 }
 
 class WebsiteState(website: Website) {
