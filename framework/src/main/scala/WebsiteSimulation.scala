@@ -1,12 +1,16 @@
+class WebsiteSimulation(
+    website:      Website,
+    userFactory:  UserFactory[User],
+    websiteAgent: WebsiteAgent,
+    websiteState: Option[WebsiteState] = None
+) extends Simulation {
 
-
-class WebsiteSimulation(website: Website, userFactory: UserFactory[User], websiteAgent: WebsiteAgent) extends Simulation {
-  // System.setProperty("org.graphstream.ui.renderer", "org.graphstream.ui.j2dviewer.J2DGraphRenderer")
-
-  val state = new WebsiteStateVisualization(website)
+  val state = websiteState match {
+    case Some(ws) => ws
+    case None => new WebsiteState(website)
+  }
 
   def newUsers() {
-
     val newUsers = userFactory.users.next()
     println(s"New users: ${newUsers.length}")
 

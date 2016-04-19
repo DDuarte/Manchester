@@ -24,7 +24,7 @@ resolvers ++= Seq(
   "Typesafe repository" at "http://repo.typesafe.com/typesafe/releases/"
 )
 
-lazy val manchester = (project in file("framework")).
+lazy val framework = (project in file("framework")).
   settings(commonSettings: _*).
   settings(
     name := "Manchester",
@@ -32,13 +32,10 @@ lazy val manchester = (project in file("framework")).
       "org.scalanlp" %% "breeze" % "0.12",
       "org.scalanlp" %% "breeze-natives" % "0.12",
       "org.scalanlp" %% "breeze-viz" % "0.12",
-      "org.graphstream" % "gs-core" % "1.3",
-      "org.graphstream" % "gs-ui" % "1.3",
       "org.mongodb.scala" %% "mongo-scala-driver" % "1.1.0",
       "com.typesafe" % "config" % "1.3.0",
       "org.json4s" %% "json4s-native" % "3.3.0"
-    ),
-    fork in run := true // required for GraphStream visualizer http://stackoverflow.com/questions/21464673/sbt-trapexitsecurityexception-thrown-at-sbt-run
+    )
   )
 
 lazy val frontend = (project in file("frontend")).enablePlugins(PlayScala).
@@ -55,7 +52,7 @@ lazy val frontend = (project in file("frontend")).enablePlugins(PlayScala).
     )
   )
 
-lazy val kkparser = (project in file("playground/KKParser")).
+lazy val KKParser = (project in file("playground/KKParser")).
   settings(commonSettings: _*).
   settings(
     name := "KKParser",
@@ -64,7 +61,7 @@ lazy val kkparser = (project in file("playground/KKParser")).
     )
   )
 
-lazy val recommendationmllib = (project in file("playground/RecommendationMLlib")).
+lazy val RecommendationMLlib = (project in file("playground/RecommendationMLlib")).
   settings(commonSettings: _*).
   settings(
     name := "RecommendationMLlib",
@@ -83,5 +80,16 @@ lazy val GephiWebsiteGraph = (project in file("playground/GephiWebsiteGraph")).
     )
   )
 
-lazy val root = (project in file(".")).aggregate(manchester, frontend,
-  kkparser, recommendationmllib, GephiWebsiteGraph)
+lazy val SmallSimulationExample = (project in file("examples/SmallSimulation")).
+  settings(commonSettings: _*).
+  settings(
+    name := "SmallSimulation",
+    fork in run := true, // required for GraphStream visualizer http://stackoverflow.com/questions/21464673/sbt-trapexitsecurityexception-thrown-at-sbt-run
+    libraryDependencies ++= Seq(
+      "org.graphstream" % "gs-core" % "1.3",
+      "org.graphstream" % "gs-ui" % "1.3"
+    )
+  ).dependsOn(framework)
+
+lazy val root = (project in file(".")).aggregate(framework, frontend,
+  KKParser, RecommendationMLlib, GephiWebsiteGraph)
