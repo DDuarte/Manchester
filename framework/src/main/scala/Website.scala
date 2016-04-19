@@ -1,8 +1,7 @@
 import java.text.DecimalFormat
 
-import com.typesafe.config.ConfigFactory
 import org.mongodb.scala.bson.collection.immutable.Document
-import org.mongodb.scala.{Completed, MongoClient}
+import org.mongodb.scala._
 
 import scala.collection.immutable.ListMap
 import scala.collection.mutable.{HashMap => MHashMap, Map => MMap, Set => MSet}
@@ -42,7 +41,7 @@ class WebsiteState(website: Website) {
   protected var sessionCount = 0l
   protected def bounceRate = singleSessionCount.toDouble / sessionCount
 
-  def display(): Unit = ???
+  def display(): Unit = println(toString)
 
   def visitPage(user: User, page: Page) {
     users.put(user, page)
@@ -136,15 +135,8 @@ class WebsiteState(website: Website) {
     pretty(render(json))
   }
 
-  def saveToDb: Future[Seq[Completed]] = {
+  def saveToDb(collection: MongoCollection[Document]): Future[Seq[Completed]] = {
     // TODO: atm this only supports mongodb backend
-
-    val config = ConfigFactory.load()
-
-    val mongoClient = MongoClient(config.getString("mongodb.url"))
-    val database = mongoClient.getDatabase(config.getString("mongodb.db"))
-    val collection = database.getCollection("simulations")
-
     collection.insertOne(Document(toJson)).toFuture()
   }
 }

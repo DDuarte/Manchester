@@ -91,5 +91,14 @@ lazy val SmallSimulationExample = (project in file("examples/SmallSimulation")).
     )
   ).dependsOn(framework)
 
-lazy val root = (project in file(".")).aggregate(framework, frontend,
-  KKParser, RecommendationMLlib, GephiWebsiteGraph)
+lazy val MongoSimulationExample = (project in file("examples/MongoSimulation")).
+  settings(commonSettings: _*).
+  settings(
+    name := "MongoSimulation",
+    libraryDependencies ++= Seq()
+  ).dependsOn(framework)
+
+lazy val root = (project in file(".")).aggregate(
+  framework, frontend, KKParser,
+  RecommendationMLlib, GephiWebsiteGraph,
+  SmallSimulationExample, MongoSimulationExample)

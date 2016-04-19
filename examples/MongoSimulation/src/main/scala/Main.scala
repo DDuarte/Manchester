@@ -1,20 +1,20 @@
 import java.util.concurrent.TimeUnit
 
-import MongoHelpers._
 import breeze.stats.distributions.Poisson
 import com.typesafe.config.ConfigFactory
 import org.bson.BsonDocument
 import org.mongodb.scala.MongoClient
-import org.mongodb.scala.bson.collection.immutable.Document
-import org.mongodb.scala.bson.{BsonArray, BsonInt64, BsonString}
+import org.mongodb.scala.bson.{BsonArray, BsonInt64, _}
 import org.mongodb.scala.model.Projections._
 import org.mongodb.scala.model.Sorts._
 
-import scala.collection.JavaConversions._
-import scala.collection.mutable.{Set => MSet}
 import scala.concurrent.duration.Duration
+import scala.collection.mutable.{Set => MSet}
+import scala.collection.JavaConversions._
 
-object Boot extends App {
+import MongoHelpers._
+
+object Main extends App {
   val config = ConfigFactory.load()
 
   def loadMongoWebsite(url: String, dbName: String, collectionName: String): Website = {
@@ -120,13 +120,16 @@ object Boot extends App {
   )
 
   var sim = new WebsiteSimulation(website, AffinityFactory(profiles), DummyWebsiteAgent())
-  // sim.state.display
+
   Utilities.time("sim run") {
     sim.run()
   }
 
-  val json = sim.state.toJson
-  println(json)
+  println(sim.state)
 
-  sim.state.saveToDb
+  val mongoClient = MongoClient(config.getString("mongodb.url"))
+  val database = mongoClient.getDatabase(config.getString("mongodb.db"))
+  val collection = database.getCollection("simulations")
+
+  sim.state.saveToDb(collection)
 }

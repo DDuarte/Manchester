@@ -1,11 +1,15 @@
 import java.util.concurrent.TimeUnit
 
 import breeze.stats.distributions.Poisson
+import com.typesafe.config.ConfigFactory
+import org.mongodb.scala.MongoClient
 
 import scala.concurrent.duration.Duration
 import scala.collection.mutable.{Set => MSet}
 
 object Main extends App {
+  val config = ConfigFactory.load()
+
   def loadExampleWebsite(): Website = {
     val homepage = Page("homepage", MSet(), Set(PageTypesTags.generic))
     val electronics = Page("electronics", MSet(), Set("electro", PageTypesTags.list))
@@ -72,6 +76,9 @@ object Main extends App {
     sim.run()
   }
 
-  println(sim.state)
-  sim.state.saveToDb
+  val mongoClient = MongoClient(config.getString("mongodb.url"))
+  val database = mongoClient.getDatabase(config.getString("mongodb.db"))
+  val collection = database.getCollection("simulations")
+
+  sim.state.saveToDb(collection)
 }
