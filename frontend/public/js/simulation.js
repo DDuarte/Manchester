@@ -48,4 +48,5 @@ $(document).ready(function() {
         var chart = new Highcharts.Chart(options);
     });
 
+    $('.dt-sort1d').DataTable().order([1, 'desc']).draw();
 });
