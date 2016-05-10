@@ -1,13 +1,15 @@
+import java.lang.reflect.ParameterizedType
+
 class WebsiteSimulation(
-    website:      Website,
-    userFactory:  UserFactory[User],
-    websiteAgent: WebsiteAgent,
-    websiteState: Option[WebsiteState] = None
+    val website:      Website,
+    val userFactory:  UserFactory[User],
+    val websiteAgent: WebsiteAgent,
+    val websiteState: Option[WebsiteState] = None
 ) extends Simulation {
 
   val state = websiteState match {
     case Some(ws) => ws
-    case None => new WebsiteState(website)
+    case None => new WebsiteState(this)
   }
 
   def newUsers() {
@@ -53,9 +55,13 @@ class WebsiteSimulation(
     }
   }
 
+  state.startSimulation()
+
   schedule(0) {
     userInjector()
   }
+
+  state.finishSimulation()
 
   def sleep(ms: Int = 50) {
     try {

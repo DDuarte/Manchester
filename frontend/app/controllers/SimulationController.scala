@@ -23,7 +23,7 @@ class SimulationController @Inject() (simulationRepo: SimulationRepo) extends Co
     MessageFlowTransformer.stringMessageFlowTransformer.map { s =>
       Json.fromJson[Simulation](Json.parse(s)) match {
         case JsSuccess(simulation, _) => simulation
-        case JsError(_) => Simulation("error", "error", 0, 0.0, Map(), Map(), Map())
+        case JsError(_) => Simulation("error", "error", 0, 0.0, Map(), Map(), Map(), "", "", "", "", "")
       }
     }
   }

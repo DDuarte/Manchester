@@ -30,9 +30,11 @@ object Main extends App {
         config.getString("mongodb.collections.pages.id"),
         config.getString("mongodb.collections.pages.type"),
         config.getString("mongodb.collections.pages.categories"),
-        config.getString("mongodb.collections.pages.links")
+        config.getString("mongodb.collections.pages.links"),
+        "productName", "productDescription", "price", "dynamicCount"
       ))
       .sort(ascending("_id"))
+      // .limit(1000)
       .results()
       .map { doc =>
         {
@@ -40,25 +42,45 @@ object Main extends App {
 
           if (homepageId == null) homepageId = id
 
-          val pageType = doc.get[BsonString](config.getString("mongodb.collections.pages.type")).map(_.asString().getValue) match {
-            case Some(t) if t == config.getString("types.list") => PageTypesTags.list
-            case Some(t) if t == config.getString("types.product") => PageTypesTags.product
-            case Some(t) if t == config.getString("types.cart") => PageTypesTags.cart
-            case Some(t) if t == config.getString("types.generic") => PageTypesTags.generic
-            case Some(t) =>
-              Console.err.println(s"Page $id has unknown type $t")
-              PageTypesTags.generic
-            case None =>
-              Console.err.println(s"Page $id has no type")
-              PageTypesTags.generic
-          }
+          val pageType = doc.get[BsonString](config.getString("mongodb.collections.pages.type"))
+            .map(_.asString().getValue) match {
+              case Some(t) if t == config.getString("types.list") => PageTypesTags.list
+              case Some(t) if t == config.getString("types.product") => PageTypesTags.product
+              case Some(t) if t == config.getString("types.cart") => PageTypesTags.cart
+              case Some(t) if t == config.getString("types.generic") => PageTypesTags.generic
+              case Some(t) =>
+                Console.err.println(s"Page $id has unknown type $t")
+                PageTypesTags.generic
+              case None =>
+                Console.err.println(s"Page $id has no type")
+                PageTypesTags.generic
+            }
+
+          val product = if (pageType == PageTypesTags.product) {
+
+            val productName = doc.get[BsonString]("productName").get.getValue
+            val productDescription = doc.get[BsonString]("productDescription")
+              .getOrElse(BsonString("No description")).getValue
+
+            val pricePattern = "([0-9]+\\.?,?[0-9]+) ?(.+)".r
+            val pricePattern(price, currency) = doc.get[BsonString]("price").get.getValue
+
+            Some(Product(id, productName, productDescription, price.replace(',', '.').toDouble, currency))
+          } else
+            None
+
+          /*val optionalCart = doc.get[Boolean]("cart") match {
+            case Some(true) => Some(PageTypesTags.cart)
+            case Some(false) => None
+            case None => None
+          }*/
 
           val tags: Set[String] = doc.get[BsonArray](config.getString("mongodb.collections.pages.categories"))
             .getOrElse(BsonArray()).getValues.map(_.asString().getValue).toSet + pageType
           val links = doc.get[BsonArray](config.getString("mongodb.collections.pages.links"))
             .getOrElse(BsonArray()).getValues.map(_.asString().getValue).toSet
 
-          id -> (Page(id, MSet(), tags), links)
+          id -> (Page(id, MSet(), tags, product), links)
         }
       }: _*)
 
@@ -100,7 +122,7 @@ object Main extends App {
           val duration = Duration(doc.get[BsonInt64](config.getString("mongodb.collections.profiles.avgDuration"))
             .getOrElse(BsonInt64(0l)).longValue(), TimeUnit.SECONDS)
 
-          UserProfile(affinities, pageWeights, duration, Poisson(250), 0.33, 0.15 /* TODO: hardcoded */ ) -> 1.0 /* TODO: hardcoded */
+          UserProfile(affinities, pageWeights, duration, Poisson(250), 0.05, 0.15 /* TODO: hardcoded */ ) -> 1.0 /* TODO: hardcoded */
         }
       }: _*)
   }

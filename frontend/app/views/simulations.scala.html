@@ -8,12 +8,14 @@
             <tr>
                 <th>Id</th>
                 <th>Name</th>
+                <th>Types</th>
             </tr>
         </thead>
         <tfoot>
             <tr>
                 <th>Id</th>
                 <th>Name</th>
+                <th>Types</th>
             </tr>
         </tfoot>
         <tbody>
@@ -21,6 +23,7 @@
                 <tr>
                     <td><a href="@routes.SimulationController.simulations(sim._id)">@sim._id</a></td>
                     <td>@sim.name</td>
+                    <td>@sim.userFactoryName [ @sim.userAgentName ] / @sim.websiteAgentName</td>
                 </tr>
             }
         </tbody>

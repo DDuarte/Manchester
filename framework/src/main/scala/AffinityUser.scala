@@ -21,10 +21,11 @@ case class AffinityUser(id: String, profile: UserProfile) extends User {
   override def emitAction(currentPage: Page, website: Website): Action = {
     if ((Rand.randInt(101).draw() < profile.exitProb * 100) || currentPage.links.isEmpty)
       ExitAction()
-    else if ((Rand.randInt(101).draw() <= profile.addToCartProb * 100) && currentPage.tags.contains(PageTypesTags.product)) {
+    else if ((Rand.randInt(101).draw() <= profile.addToCartProb * 100) &&
+      currentPage.tags.contains(PageTypesTags.product)) {
       // assumed that a product page links to a cart page
       val cartPage = currentPage.links.find(l => l.tags.contains(PageTypesTags.cart)).get
-      AddToCartAction(currentPage, cartPage)
+      AddToCartAction(currentPage.product.get, cartPage)
     } else {
       val affSelected = RandHelper.choose(profile.affinities).draw()
 
@@ -47,5 +48,5 @@ case class UserProfile(
   averageSessionDuration: Duration,
   arrivalDistribution:    DiscreteDistr[Int],
   addToCartProb:          Double,
-  exitProb:               Double
+  exitProb:               Double // bounce rate
 )

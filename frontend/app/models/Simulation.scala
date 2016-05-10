@@ -17,17 +17,29 @@ import play.api.modules.tepkinmongo.TepkinMongoApi
 import scala.concurrent.Future
 import scala.concurrent.duration._
 
+case class Purchases(
+  count:      Long,
+  totalPrice: Double,
+  currency:   String
+)
+
 case class Simulation(
-  _id:               String,
-  name:              String,
-  uniqueUsers:       Int,
-  bounceRate:        Double,
-  visits:            Map[String, Int],
-  visitsPerCategory: Map[String, Map[String, Int]],
-  purchases:         Map[String, Int]
+  _id:                 String,
+  name:                String,
+  uniqueUsers:         Int,
+  bounceRate:          Double,
+  visits:              Map[String, Int],
+  visitsPerCategory:   Map[String, Map[String, Int]],
+  purchases:           Map[String, Purchases],
+  userFactoryName:     String,
+  userAgentName:       String,
+  websiteAgentName:    String,
+  simulationStartTime: String,
+  simulationEndTime:   String
 )
 
 object Simulation {
+  implicit val purchasesFormatter = Json.format[Purchases]
   implicit val simulationFormatter = Json.format[Simulation]
   def apply(bson: BsonDocument): JsResult[Simulation] = {
     Json.fromJson[Simulation](bson)

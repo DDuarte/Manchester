@@ -11,15 +11,21 @@ object Main extends App {
   val config = ConfigFactory.load()
 
   def loadExampleWebsite(): Website = {
-    val homepage = Page("homepage", MSet(), Set(PageTypesTags.generic))
-    val electronics = Page("electronics", MSet(), Set("electro", PageTypesTags.list))
-    val computers = Page("computers", MSet(), Set("electro", PageTypesTags.product))
-    val lingerie = Page("lingerie", MSet(), Set("cloth", PageTypesTags.product))
-    val tshirts = Page("tshirts", MSet(), Set("cloth", PageTypesTags.product))
-    val football = Page("football", MSet(), Set("sports", "football", PageTypesTags.product))
-    val cloth = Page("cloth", MSet(), Set("cloth", PageTypesTags.list))
-    val sports = Page("sports", MSet(), Set("sports", "football", PageTypesTags.list))
-    val cart = Page("cart", MSet(), Set(PageTypesTags.cart))
+
+    val computerA = Product("computera", "Computer A", "Some computer", 499.9, "€")
+    val tshirtA = Product("tshirta", "T-shirt A", "Some tshirt", 9.9, "€")
+    val lingerieA = Product("lingeriea", "Lingerie A", "A sexy lingerie", 39.9, "€")
+    val footballA = Product("footballa", "Football A", "A ball, or something", 49.9, "€")
+
+    val homepage = Page("homepage", MSet(), Set(PageTypesTags.generic), None)
+    val electronics = Page("electronics", MSet(), Set("electro", PageTypesTags.list), None)
+    val computers = Page("computers", MSet(), Set("electro", PageTypesTags.product), Some(computerA))
+    val lingerie = Page("lingerie", MSet(), Set("cloth", PageTypesTags.product), Some(lingerieA))
+    val tshirts = Page("tshirts", MSet(), Set("cloth", PageTypesTags.product), Some(tshirtA))
+    val football = Page("football", MSet(), Set("sports", "football", PageTypesTags.product), Some(footballA))
+    val cloth = Page("cloth", MSet(), Set("cloth", PageTypesTags.list), None)
+    val sports = Page("sports", MSet(), Set("sports", "football", PageTypesTags.list), None)
+    val cart = Page("cart", MSet(), Set(PageTypesTags.cart), None)
 
     homepage.links += (electronics, cloth, sports, homepage)
     electronics.links += (computers, homepage, electronics)

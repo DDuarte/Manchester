@@ -1,7 +1,3 @@
-import breeze.stats.distributions.{DiscreteDistr, Rand}
-
-import scala.concurrent.duration.Duration
-
 trait UserFactory[+T] {
   def users: Iterator[List[T]]
   def getNewUserId: String

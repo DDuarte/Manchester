@@ -15,7 +15,7 @@ case class RandomUser(id: String) extends User {
       ExitAction()
     else if (Rand.randInt(101).draw() <= 5 /* 5% */ && currentPage.tags.contains(PageTypesTags.product)) {
       val cartPage = currentPage.links.find(l => l.tags.contains(PageTypesTags.cart)).get
-      AddToCartAction(currentPage, cartPage)
+      AddToCartAction(currentPage.product.get, cartPage)
     } else {
       val nextPage = Rand.choose(currentPage.links).draw()
       BrowseToAction(nextPage)
