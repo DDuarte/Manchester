@@ -3,7 +3,7 @@ import java.util.concurrent.TimeUnit
 import breeze.stats.distributions.Poisson
 import com.typesafe.config.ConfigFactory
 import org.bson.BsonDocument
-import org.mongodb.scala.MongoClient
+import org.mongodb.scala.{MongoClient, MongoDatabase}
 import org.mongodb.scala.bson.{BsonArray, BsonInt64, _}
 import org.mongodb.scala.model.Projections._
 import org.mongodb.scala.model.Sorts._
@@ -11,15 +11,15 @@ import org.mongodb.scala.model.Sorts._
 import scala.concurrent.duration.Duration
 import scala.collection.mutable.{Set => MSet}
 import scala.collection.JavaConversions._
-
 import MongoHelpers._
 
 object Main extends App {
   val config = ConfigFactory.load()
 
-  def loadMongoWebsite(url: String, dbName: String, collectionName: String): Website = {
-    val mongoClient = MongoClient(url)
-    val database = mongoClient.getDatabase(dbName)
+  val mongoClient = MongoClient(config.getString("mongodb.url"))
+  val database = mongoClient.getDatabase(config.getString("mongodb.db"))
+
+  def loadMongoWebsite(database: MongoDatabase, collectionName: String): Website = {
     val collection = database.getCollection(collectionName)
 
     var homepageId: String = null
@@ -96,9 +96,7 @@ object Main extends App {
     Website(pages.map(p => p._2._1).toSet, pages.get(homepageId).get._1)
   }
 
-  def loadMongoProfiles(url: String, dbName: String, collectionName: String): Map[UserProfile, Double] = {
-    val mongoClient = MongoClient(url)
-    val database = mongoClient.getDatabase(dbName)
+  def loadMongoProfiles(database: MongoDatabase, collectionName: String): Map[UserProfile, Double] = {
     val collection = database.getCollection(collectionName)
 
     Map(collection
@@ -129,15 +127,13 @@ object Main extends App {
 
   val website = Utilities.time("load website") {
     loadMongoWebsite(
-      config.getString("mongodb.url"),
-      config.getString("mongodb.db"),
+      database,
       config.getString("mongodb.collections.pages.name")
     )
   }
 
   val profiles = loadMongoProfiles(
-    config.getString("mongodb.url"),
-    config.getString("mongodb.db"),
+    database,
     config.getString("mongodb.collections.profiles.name")
   )
 
@@ -149,9 +145,9 @@ object Main extends App {
 
   println(sim.state)
 
-  val mongoClient = MongoClient(config.getString("mongodb.url"))
-  val database = mongoClient.getDatabase(config.getString("mongodb.db"))
   val collection = database.getCollection("simulations")
 
   sim.state.saveToDb(collection)
+
+  mongoClient.close()
 }
