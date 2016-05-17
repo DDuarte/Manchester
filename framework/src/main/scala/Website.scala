@@ -47,7 +47,7 @@ object Page {
   }
 }
 
-class WebsiteState(sim: WebsiteSimulation) {
+class WebsiteState {
 
   protected val visits = MHashMap[Page, Long]()
   protected val visitsPerUser = MHashMap[User, Long]()
@@ -141,7 +141,7 @@ class WebsiteState(sim: WebsiteSimulation) {
     sb.toString()
   }
 
-  def toJson: String = {
+  def toJson(sim: WebsiteSimulation): String = {
     import org.json4s.JsonDSL._
     import org.json4s.native.JsonMethods._
 
@@ -178,9 +178,9 @@ class WebsiteState(sim: WebsiteSimulation) {
     pretty(render(json))
   }
 
-  def saveToDb(collection: MongoCollection[Document]): Future[Seq[Completed]] = {
+  def saveToDb(collection: MongoCollection[Document], sim: WebsiteSimulation): Future[Seq[Completed]] = {
     // TODO: atm this only supports mongodb backend
-    collection.insertOne(Document(toJson)).toFuture()
+    collection.insertOne(Document(toJson(sim))).toFuture()
   }
 }
 

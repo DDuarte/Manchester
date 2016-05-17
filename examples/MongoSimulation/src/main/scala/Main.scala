@@ -147,7 +147,7 @@ object Main extends App {
 
   val collection = database.getCollection("simulations")
 
-  sim.state.saveToDb(collection)
+  sim.state.saveToDb(collection, sim)
 
   mongoClient.close()
 }

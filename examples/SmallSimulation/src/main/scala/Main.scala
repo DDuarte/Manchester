@@ -69,7 +69,7 @@ object Main extends App {
 
   val website = loadExampleWebsite()
 
-  val sim = new WebsiteSimulation(
+  lazy val sim: WebsiteSimulation = new WebsiteSimulation(
     website,
     AffinityFactory(loadExampleProfiles()),
     DummyWebsiteAgent(),
@@ -86,5 +86,6 @@ object Main extends App {
   val database = mongoClient.getDatabase(config.getString("mongodb.db"))
   val collection = database.getCollection("simulations")
 
-  sim.state.saveToDb(collection)
+  sim.state.saveToDb(collection, sim)
+  mongoClient.close()
 }

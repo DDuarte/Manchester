@@ -4,10 +4,10 @@ import org.graphstream.graph.implementations.MultiGraph
 
 import scala.collection.JavaConversions._
 
-class WebsiteStateVisualization(website: Website) extends WebsiteState(website) {
+class WebsiteStateVisualization(val website: Website) extends WebsiteState {
   // System.setProperty("org.graphstream.ui.renderer", "org.graphstream.ui.j2dviewer.J2DGraphRenderer")
 
-  protected val graph = {
+  protected lazy val graph = {
     val graph = new MultiGraph("Website", false, true)
     graph.addAttribute("ui.quality")
     graph.addAttribute("ui.antialias")
