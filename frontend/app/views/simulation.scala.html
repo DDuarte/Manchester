@@ -48,13 +48,15 @@
                     <tr>
                         <th>Product</th>
                         <th>Count</th>
+                        <th>Total Price</th>
                     </tr>
                 </thead>
                 <tbody>
                 @for((key, value) <- simulation.purchases) {
                     <tr>
                         <td>@key</td>
-                        <td>@value</td>
+                        <td>@value.count</td>
+                        <td>@value.totalPrice @Html(value.currency)</td>
                     </tr>
                 }
                 </tbody>

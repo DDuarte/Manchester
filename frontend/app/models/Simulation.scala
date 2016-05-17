@@ -44,10 +44,6 @@ object Simulation {
   def apply(bson: BsonDocument): JsResult[Simulation] = {
     Json.fromJson[Simulation](bson)
   }
-
-  def toBsonDocument(simulation: Simulation): BsonDocument =
-    ("_id" := simulation._id) ~
-      ("name" := simulation.name)
 }
 
 class SimulationRepo @Inject() (tepkinMongoApi: TepkinMongoApi) {
@@ -56,19 +52,11 @@ class SimulationRepo @Inject() (tepkinMongoApi: TepkinMongoApi) {
 
   val simulations = tepkinMongoApi.client("kugsha")("simulations")
 
-  def create(name: String): Future[Boolean] = {
-    val simulation = "name" := name
-    simulations.insert(simulation).map(_.ok)
-  }
-
   def all: Source[List[Simulation], ActorRef] = {
     simulations.find(new BsonDocument()).map(l => l.map(Simulation(_)).collect {
       case JsSuccess(p, _) => p
     })
   }
-
-  def insert(ps: List[Simulation]) =
-    simulations.insert(ps.map(Simulation.toBsonDocument))
 
   private def stringToObjectId(id: String) =
     BsonObjectId("_id", BsonValueObjectId(Converters.str2Hex(id)))
