@@ -72,7 +72,10 @@ class SimulationController @Inject() (simulationRepo: SimulationRepo) extends Co
   def simulations(id: String) = Action.async {
     for {
       Some(simulation) <- simulationRepo.findById(id)
-    } yield Ok(views.html.simulation(simulation))
+      sim = simulation.copy(
+        purchases = simulation.purchases.map(s => (s._1, s._2.copy(currency = "&euro;")))
+      )
+    } yield Ok(views.html.simulation(sim))
   }
 
   def index = Action.async {
