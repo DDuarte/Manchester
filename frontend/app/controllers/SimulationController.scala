@@ -2,10 +2,9 @@ package controllers
 
 import javax.inject.Inject
 
-import akka.stream.scaladsl.Flow
-import akka.util.ByteString
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
+import akka.util.ByteString
 import models.{Simulation, SimulationRepo}
 import play.api.http.HttpEntity.Streamed
 import play.api.http.MimeTypes
@@ -13,8 +12,6 @@ import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json._
 import play.api.mvc.WebSocket.MessageFlowTransformer
 import play.api.mvc._
-
-import scala.concurrent.duration._
 
 // @Singleton
 class SimulationController @Inject() (simulationRepo: SimulationRepo) extends Controller {
