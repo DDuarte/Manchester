@@ -8,6 +8,7 @@ GET     /                           controllers.HomeController.index
 GET     /simulations                controllers.SimulationController.index
 GET     /simulations/:id            controllers.SimulationController.simulations(id: String)
 GET     /simulations/:id/visitsPerCategory controllers.SimulationController.simulationsVisitsPerCategoryApi(id: String)
+GET     /simulations/compare/:a/:b  controllers.SimulationController.compare(a: String, b: String)
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)

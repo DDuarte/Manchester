@@ -11,8 +11,10 @@ import play.api.inject.{ApplicationLifecycle, Binding, Module}
   */
 @ Singleton
 final class TepkinMongoModule extends Module {
-  override def bindings(environment: Environment,
-                        configuration: Configuration): Seq[Binding[_]] =
+  override def bindings(
+      environment: Environment,
+      configuration: Configuration
+  ): Seq[Binding[_]] =
     Seq(bind[TepkinMongoApi].to[DefaultTepkinMongoApi].in[Singleton])
 }
 
@@ -30,5 +32,7 @@ final class DefaultTepkinMongoApi @Inject()(
       configuration
         .getString("mongodb.uri")
         .getOrElse(throw new IllegalStateException(
-                "Please configure mongodb.uri in your application.conf for example \"mongodb://localhost\" ")))
+                "Please configure mongodb.uri in your application.conf for example \"mongodb://localhost\" "
+            ))
+  )
 }

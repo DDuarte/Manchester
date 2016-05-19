@@ -49,4 +49,13 @@ $(document).ready(function() {
     });
 
     $('.dt-sort1d').DataTable().order([1, 'desc']).draw();
+
+    $('#dt-compare-general').DataTable({
+        "paging":   false,
+        "ordering": false,
+        "info":     false,
+        "columnDefs": [
+            { className: "dt-right", "targets": [ 1 ] }
+        ]
+    });
 });

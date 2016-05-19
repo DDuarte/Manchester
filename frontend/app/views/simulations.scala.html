@@ -3,27 +3,22 @@
 @main("Simulations") {
     <h1 class="page-header">Simulations</h1>
 
-    <table class="display table table-striped datatable" cellspacing="0">
+    <table class="display table datatable-simulations" cellspacing="0">
         <thead>
             <tr>
                 <th>Id</th>
                 <th>Name</th>
                 <th>Types</th>
+                <th>Time</th>
             </tr>
         </thead>
-        <tfoot>
-            <tr>
-                <th>Id</th>
-                <th>Name</th>
-                <th>Types</th>
-            </tr>
-        </tfoot>
         <tbody>
             @for(sim <- simulations) {
                 <tr>
                     <td><a href="@routes.SimulationController.simulations(sim._id)">@sim._id</a></td>
                     <td>@sim.name</td>
                     <td>@sim.userFactoryName [ @sim.userAgentName ] / @sim.websiteAgentName</td>
+                    <td>@sim.simulationEndTime</td>
                 </tr>
             }
         </tbody>

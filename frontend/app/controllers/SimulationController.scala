@@ -22,18 +22,20 @@ class SimulationController @Inject()(simulationRepo: SimulationRepo)
       Json.fromJson[Simulation](Json.parse(s)) match {
         case JsSuccess(simulation, _) => simulation
         case JsError(_) =>
-          Simulation("error",
-                     "error",
-                     0,
-                     0.0,
-                     Map(),
-                     Map(),
-                     Map(),
-                     "",
-                     "",
-                     "",
-                     "",
-                     "")
+          Simulation(
+              "error",
+              "error",
+              0,
+              0.0,
+              Map(),
+              Map(),
+              Map(),
+              "",
+              "",
+              "",
+              "",
+              ""
+          )
       }
     }
   }
@@ -87,6 +89,21 @@ class SimulationController @Inject()(simulationRepo: SimulationRepo)
                 (s._1, s._2.copy(currency = "&euro;")))
       )
     } yield Ok(views.html.simulation(sim))
+  }
+
+  def compare(a: String, b: String) = Action.async {
+    for {
+      Some(simulationA) <- simulationRepo.findById(a)
+      simA = simulationA.copy(
+          purchases = simulationA.purchases.map(s =>
+                (s._1, s._2.copy(currency = "&euro;")))
+      )
+      Some(simulationB) <- simulationRepo.findById(b)
+      simB = simulationB.copy(
+          purchases = simulationB.purchases.map(s =>
+                (s._1, s._2.copy(currency = "&euro;")))
+      )
+    } yield Ok(views.html.compare(simA, simB))
   }
 
   def index = Action.async {

@@ -1,0 +1,85 @@
+@(simulationA: Simulation, simulationB: Simulation)
+
+@scripts = {
+    <script type="text/javascript" src="https://code.highcharts.com/highcharts.js"></script>
+    <script type="text/javascript" src="https://code.highcharts.com/modules/data.js"></script>
+    <script type="text/javascript" src="https://code.highcharts.com/modules/drilldown.js"></script>
+    <script type="text/javascript" src=@routes.Assets.versioned("js/simulation.js")></script>
+}
+
+@main("Simulations", scripts) {
+    <h1 class="page-header">@simulationA.name <small>@simulationA._id</small> vs @simulationB.name <small>@simulationB._id</small></h1>
+
+    <div class="row">
+
+        <div class="table-responsive col-md-12">
+            <h2 class="sub-header">General</h2>
+            <table id="dt-compare-general" class="display table table-hover table-condensed" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>Field</th>
+                        <th class="text-right">A</th>
+                        <th>B</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Name</strong></td>
+                        <td class="text-right">@simulationA.name</td>
+                        <td>@simulationB.name</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Types</strong></td>
+                        <td class="text-right">@simulationA.userFactoryName [ @simulationA.userAgentName ] / @simulationA.websiteAgentName</td>
+                        <td>@simulationB.userFactoryName [ @simulationB.userAgentName ] / @simulationB.websiteAgentName</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Start time</strong></td>
+                        <td class="text-right">@simulationA.simulationStartTime</td>
+                        <td>@simulationB.simulationStartTime</td>
+                    </tr>
+                    <tr>
+                        <td><strong>End time</strong></td>
+                        <td class="text-right">@simulationA.simulationEndTime</td>
+                        <td>@simulationB.simulationEndTime</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Unique users</strong></td>
+                        <td class="text-right">@simulationA.uniqueUsers</td>
+                        <td>@simulationB.uniqueUsers</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Bounce rate</strong></td>
+                        <td class="text-right">@((simulationA.bounceRate * 100.0).formatted("%.2f"))%</td>
+                        <td>@((simulationB.bounceRate * 100.0).formatted("%.2f"))%</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="row">
+
+        <div class="table-responsive col-md-6">
+            <h2 class="sub-header">Visits</h2>
+            <table class="display table table-striped datatable dt-sort1d" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>Page</th>
+                        <th>Count A</th>
+                        <th>Count B</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @for((key, value) <- (simulationA.visits.keySet ++ simulationB.visits.keySet).map(i => (i, (simulationA.visits.getOrElse(i, 0), simulationB.visits.getOrElse(i, 0)))).toMap) {
+                    <tr>
+                        <td>@key</td>
+                        <td>@value._1</td>
+                        <td>@value._2</td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
