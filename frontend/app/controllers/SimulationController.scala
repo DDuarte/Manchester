@@ -14,13 +14,26 @@ import play.api.mvc.WebSocket.MessageFlowTransformer
 import play.api.mvc._
 
 // @Singleton
-class SimulationController @Inject() (simulationRepo: SimulationRepo) extends Controller {
+class SimulationController @Inject()(simulationRepo: SimulationRepo)
+    extends Controller {
 
   implicit val mt: MessageFlowTransformer[Simulation, String] = {
     MessageFlowTransformer.stringMessageFlowTransformer.map { s =>
       Json.fromJson[Simulation](Json.parse(s)) match {
         case JsSuccess(simulation, _) => simulation
-        case JsError(_) => Simulation("error", "error", 0, 0.0, Map(), Map(), Map(), "", "", "", "", "")
+        case JsError(_) =>
+          Simulation("error",
+                     "error",
+                     0,
+                     0.0,
+                     Map(),
+                     Map(),
+                     Map(),
+                     "",
+                     "",
+                     "",
+                     "",
+                     "")
       }
     }
   }
@@ -46,22 +59,22 @@ class SimulationController @Inject() (simulationRepo: SimulationRepo) extends Co
     for {
       Some(simulation) <- simulationRepo.findById(id)
       obj: Map[String, List[Map[String, JsValue]]] = Map(
-        ("series", simulation.visitsPerCategory.map { s =>
-          Map(
-            ("name", JsString(s._1)),
-            ("drilldown", JsString(s._1)),
-            ("y", JsNumber(s._2.values.sum))
-          )
-        }.toList),
-        ("drilldown", simulation.visitsPerCategory.map { s =>
-          Map(
-            ("name", JsString(s._1)),
-            ("id", JsString(s._1)),
-            ("data", JsArray(s._2.map {
-              ss => JsArray(List(JsString(ss._1), JsNumber(ss._2)))
-            }.toList))
-          )
-        }.toList)
+          ("series", simulation.visitsPerCategory.map { s =>
+            Map(
+                ("name", JsString(s._1)),
+                ("drilldown", JsString(s._1)),
+                ("y", JsNumber(s._2.values.sum))
+            )
+          }.toList),
+          ("drilldown", simulation.visitsPerCategory.map { s =>
+            Map(
+                ("name", JsString(s._1)),
+                ("id", JsString(s._1)),
+                ("data", JsArray(s._2.map { ss =>
+                  JsArray(List(JsString(ss._1), JsNumber(ss._2)))
+                }.toList))
+            )
+          }.toList)
       )
     } yield Ok(Json.toJson(obj))
   }
@@ -70,7 +83,8 @@ class SimulationController @Inject() (simulationRepo: SimulationRepo) extends Co
     for {
       Some(simulation) <- simulationRepo.findById(id)
       sim = simulation.copy(
-        purchases = simulation.purchases.map(s => (s._1, s._2.copy(currency = "&euro;")))
+          purchases = simulation.purchases.map(s =>
+                (s._1, s._2.copy(currency = "&euro;")))
       )
     } yield Ok(views.html.simulation(sim))
   }

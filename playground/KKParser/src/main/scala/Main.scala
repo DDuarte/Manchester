@@ -25,16 +25,18 @@ object Main {
       val clientId = (json \ "uri" \ "query" \ "clientId").extractOpt[String]
       val location = (json \ "uri" \ "query" \ "location").extractOpt[String]
       val uid = (json \ "meta" \ "uid").extractOpt[String]
-      val prodName = (json \ "uri" \ "query" \ "product" \ "name").extractOpt[String]
+      val prodName =
+        (json \ "uri" \ "query" \ "product" \ "name").extractOpt[String]
 
       clientId match {
         case Some("kuantokusta") => {
 
-          if (t.getOrElse("") == "pageView" && events.add(pageType.getOrElse(""))) {
-            println(pageType + " - " + line)
-          }
+            if (t.getOrElse("") == "pageView" &&
+                events.add(pageType.getOrElse(""))) {
+              println(pageType + " - " + line)
+            }
 
-          /* if (uid.isDefined && event.isDefined && (title.isDefined || prodName.isDefined)) {
+            /* if (uid.isDefined && event.isDefined && (title.isDefined || prodName.isDefined)) {
 
             val name = if (prodName.isDefined) {
               prodName.map(_.replace(",", ";")).get
@@ -44,7 +46,7 @@ object Main {
 
             println(uid.get + "," + name + "," + event.get)
           }*/
-        }
+          }
         case _ =>
       }
     }

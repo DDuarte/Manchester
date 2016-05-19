@@ -25,8 +25,12 @@ object Main {
         {
           val id = doc.get[BsonString]("url").get.getValue
 
-          val links = doc.get[BsonArray]("outbound")
-            .getOrElse(BsonArray()).getValues.map(_.asString().getValue).toSet
+          val links = doc
+            .get[BsonArray]("outbound")
+            .getOrElse(BsonArray())
+            .getValues
+            .map(_.asString().getValue)
+            .toSet
 
           bw.write(id)
           links.foreach(link => {

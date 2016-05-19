@@ -18,24 +18,24 @@ import scala.concurrent.Future
 import scala.concurrent.duration._
 
 case class Purchases(
-  count:      Long,
-  totalPrice: Double,
-  currency:   String
+    count: Long,
+    totalPrice: Double,
+    currency: String
 )
 
 case class Simulation(
-  _id:                 String,
-  name:                String,
-  uniqueUsers:         Int,
-  bounceRate:          Double,
-  visits:              Map[String, Int],
-  visitsPerCategory:   Map[String, Map[String, Int]],
-  purchases:           Map[String, Purchases],
-  userFactoryName:     String,
-  userAgentName:       String,
-  websiteAgentName:    String,
-  simulationStartTime: String,
-  simulationEndTime:   String
+    _id: String,
+    name: String,
+    uniqueUsers: Int,
+    bounceRate: Double,
+    visits: Map[String, Int],
+    visitsPerCategory: Map[String, Map[String, Int]],
+    purchases: Map[String, Purchases],
+    userFactoryName: String,
+    userAgentName: String,
+    websiteAgentName: String,
+    simulationStartTime: String,
+    simulationEndTime: String
 )
 
 object Simulation {
@@ -46,22 +46,28 @@ object Simulation {
   }
 }
 
-class SimulationRepo @Inject() (tepkinMongoApi: TepkinMongoApi) {
+class SimulationRepo @Inject()(tepkinMongoApi: TepkinMongoApi) {
   implicit val ec = tepkinMongoApi.client.ec
   implicit val timeout: Timeout = 5.seconds
 
   val simulations = tepkinMongoApi.client("kugsha")("simulations")
 
   def all: Source[List[Simulation], ActorRef] = {
-    simulations.find(new BsonDocument()).map(l => l.map(Simulation(_)).collect {
-      case JsSuccess(p, _) => p
-    })
+    simulations
+      .find(new BsonDocument())
+      .map(l =>
+            l.map(Simulation(_))
+              .collect {
+            case JsSuccess(p, _) => p
+        })
   }
 
   private def stringToObjectId(id: String) =
     BsonObjectId("_id", BsonValueObjectId(Converters.str2Hex(id)))
 
   def findById(id: String): Future[Option[Simulation]] = {
-    simulations.findOne(stringToObjectId(id)).map(_.flatMap(Simulation(_).asOpt))
+    simulations
+      .findOne(stringToObjectId(id))
+      .map(_.flatMap(Simulation(_).asOpt))
   }
 }

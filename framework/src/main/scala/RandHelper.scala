@@ -9,7 +9,8 @@ object RandHelper {
       val indexed = weightsMap.keys.toIndexedSeq
       val weightsNArray = normalize(weightsMap.values).toArray
 
-      val mult = new Multinomial[DenseVector[Double], Int](DenseVector(weightsNArray))
+      val mult =
+        new Multinomial[DenseVector[Double], Int](DenseVector(weightsNArray))
       indexed(mult.draw())
     }
 

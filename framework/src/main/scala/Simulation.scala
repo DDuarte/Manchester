@@ -35,7 +35,7 @@ abstract class Simulation {
     }
   }
 
-  protected def processActions(actions: Seq[Action]) { actions.foreach(_()) }
+  protected def processActions(actions: Seq[Action]) { actions.foreach(_ ()) }
   protected def processTriggers() { triggers.filter(_._1()).foreach(_._2()) }
   protected def hasNext = agenda.nonEmpty
 

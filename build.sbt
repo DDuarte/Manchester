@@ -1,22 +1,10 @@
-import scalariform.formatter.preferences._
-import com.typesafe.sbt.SbtScalariform
-import com.typesafe.sbt.SbtScalariform.ScalariformKeys
-
-lazy val formattingPreferences = FormattingPreferences().
-  setPreference(AlignParameters, true).
-  setPreference(DoubleIndentClassDeclaration, true)
-
-lazy val formattingSettings = SbtScalariform.scalariformSettings ++ Seq(
-  ScalariformKeys.preferences in Compile := formattingPreferences,
-  ScalariformKeys.preferences in Test := formattingPreferences)
-
 lazy val commonSettings = Seq(
   organization := "eu.shiftforward",
   version := "0.0.1",
   scalaVersion := "2.11.8",
   scalacOptions := Seq("-unchecked", "-deprecation", "-encoding", "utf8"),
   shellPrompt := { s => Project.extract(s).currentProject.id + " > " }
-) ++ formattingSettings ++ Revolver.settings
+) ++ Revolver.settings
 
 resolvers ++= Seq(
   "Sonatype Releases" at "https://oss.sonatype.org/content/repositories/releases/",

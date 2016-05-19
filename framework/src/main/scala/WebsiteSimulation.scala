@@ -1,9 +1,10 @@
 class WebsiteSimulation(
-    val website:      Website,
-    val userFactory:  UserFactory[User],
+    val website: Website,
+    val userFactory: UserFactory[User],
     val websiteAgent: WebsiteAgent,
     val websiteState: Option[WebsiteState] = None
-) extends Simulation {
+)
+    extends Simulation {
 
   lazy val state = websiteState match {
     case Some(ws) => ws
@@ -17,7 +18,8 @@ class WebsiteSimulation(
 
       for (user <- newUsers) {
         state.newUser()
-        websiteAgent.notifyUserAction(user, None, BrowseToAction(website.homepage))
+        websiteAgent.notifyUserAction(
+            user, None, BrowseToAction(website.homepage))
         state.visitPage(user, websiteAgent.modifyPage(website.homepage, user))
       }
     }
@@ -34,12 +36,15 @@ class WebsiteSimulation(
                 case browse: BrowseToAction =>
                   val prevPage = page
                   val nextPage = browse.page
-                  state.visitPage(user, websiteAgent.modifyPage(nextPage, user))
+                  state.visitPage(user,
+                                  websiteAgent.modifyPage(nextPage, user))
                 //println(s"User ${user.id} went from page ${prevPage.id} to ${nextPage.id}")
                 case addToCart: AddToCartAction =>
                   state.addToCart(addToCart.product)
-                  state.visitPage(user, websiteAgent.modifyPage(addToCart.cartPage, user))
-                  state.visitPage(user, websiteAgent.modifyPage(website.homepage, user))
+                  state.visitPage(
+                      user, websiteAgent.modifyPage(addToCart.cartPage, user))
+                  state.visitPage(
+                      user, websiteAgent.modifyPage(website.homepage, user))
                 //println(s"User ${user.id} added ${addToCart.product.id} to cart, back to homepage")
                 case exit: ExitAction =>
                   state.exit(user)
@@ -60,8 +65,7 @@ class WebsiteSimulation(
       userInjector()
     }
 
-    while (hasNext)
-      step()
+    while (hasNext) step()
 
     state.finishSimulation()
 
