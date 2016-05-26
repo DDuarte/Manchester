@@ -47,15 +47,4 @@ $(document).ready(function() {
         options.drilldown.series = data.drilldown;
         var chart = new Highcharts.Chart(options);
     });
-
-    $('.dt-sort1d').DataTable().order([1, 'desc']).draw();
-
-    $('#dt-compare-general').DataTable({
-        "paging":   false,
-        "ordering": false,
-        "info":     false,
-        "columnDefs": [
-            { className: "dt-right", "targets": [ 1 ] }
-        ]
-    });
 });
