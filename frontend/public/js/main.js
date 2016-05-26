@@ -29,5 +29,6 @@ $(document).ready(function() {
         var a = $(simTable.rows('.active').data()[0][0]).text();
         var b = $(simTable.rows('.active').data()[1][0]).text();
         window.location.replace("/simulations/compare/" + a + "/" + b);
+        return false;
     });
 });
