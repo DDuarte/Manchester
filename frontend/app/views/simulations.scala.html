@@ -1,6 +1,10 @@
 @(simulations: List[Simulation])
 
-@main("Simulations") {
+@scripts = {
+    <script type="text/javascript" src=@routes.Assets.versioned("js/simulations.js")></script>
+}
+
+@main("Simulations", scripts) {
     <h1 class="page-header">Simulations</h1>
 
     <table class="display table datatable-simulations" cellspacing="0">
