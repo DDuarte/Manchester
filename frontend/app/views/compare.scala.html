@@ -81,5 +81,31 @@
                 </tbody>
             </table>
         </div>
+
+        <div class="table-responsive col-md-6">
+            <h2 class="sub-header">Purchases</h2>
+            <table class="display table table-striped datatable dt-sort1d" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Count A</th>
+                        <th>Total Price A</th>
+                        <th>Total Price B</th>
+                        <th>Count B</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @for((key, value) <- (simulationA.purchases.keySet ++ simulationB.purchases.keySet).map(i => (i, (simulationA.purchases.getOrElse(i, Purchases(0, 0, "€")), simulationB.purchases.getOrElse(i, Purchases(0, 0, "€"))))).toMap) {
+                    <tr>
+                        <td>@key</td>
+                        <td>@value._1.count</td>
+                        <td>@value._1.totalPrice</td>
+                        <td>@value._2.totalPrice</td>
+                        <td>@value._2.count</td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
     </div>
 }
