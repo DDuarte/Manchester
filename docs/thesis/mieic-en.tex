@@ -100,7 +100,7 @@
 \author{Duarte Duarte}
 
 %% Uncomment next line for date of submission
-\thesisdate{February 1, 2016}
+\thesisdate{June 24, 2016}
 
 %%Uncomment next line for copyright text if used
 %\copyrightnotice{Name of the Author, 2008}
@@ -121,7 +121,7 @@
 \logo{uporto-feup.pdf}
 
 %% Uncomment next line for additional text  below the author's name (front page)
-\additionalfronttext{Dissertation Planning}
+\additionalfronttext{Working Version}
 
 %%----------------------------------------
 %% Preliminary materials
@@ -130,7 +130,7 @@
 % remove unnecssary \include{} commands
 \begin{Prolog}
   \include{abstract_en} % the abstract
-  % \include{acknows_en}  % the acknowledgments
+  \include{acknows_en}  % the acknowledgments
   \include{quote}       % initial quotation if desired
   \cleardoublepage
   \pdfbookmark[0]{Table of Contents}{contents}
@@ -151,11 +151,13 @@
 
 %% TIP: use a separate file for each chapter
 \include{chapter1} % intro
-\include{chapter2} % state of the art: e-commerce
-\include{chapter3} % state of the art: simulation
-\include{chapter4} % state of the art: models
+\include{chapter2} % literature review: e-commerce
+\include{chapter3} % literature review: simulation
+\include{chapter4} % literature review: models
 \include{chapter5} % method
-\include{chapter6} % conclusion & future work
+\include{chapter6} % implementation
+\include{chapter7} % validation
+\include{chapter8} % conclusion & future work
 
 %%----------------------------------------
 %% Final materials 
@@ -173,6 +175,6 @@
 %% Index
 %% Uncomment next command if index is required
 %% don't forget to run ``makeindex mieic-en'' command
-%\PrintIndex
+%%\PrintIndex
 
 \end{document}
