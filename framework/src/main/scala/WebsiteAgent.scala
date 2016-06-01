@@ -11,7 +11,7 @@ case class DummyWebsiteAgent() extends WebsiteAgent {
 }
 
 case class CollaborativeFilteringRecommendationWebsiteAgent() extends WebsiteAgent {
-  def id = "colab_filter"
+  def id = "collab_filter"
   def modifyPage(page: Page, visitor: User): Page = ???
   def notifyUserAction(user: User, currentPage: Option[Page], action: Action): Unit = ???
 }
