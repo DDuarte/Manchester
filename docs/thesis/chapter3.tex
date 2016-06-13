@@ -51,17 +51,152 @@ This process can be visualized in figure \ref{fig:sim}.
 
 \subsection{Website Representation}
 \subsection{Navigation Agents}
-\subsection{Recommendation Agents}
+\subsection{Website Agents}
 \subsection{Simulation Engine}
 \subsection{Reporting}
 
 \section{Architecture}
 
-\subsection{Physical Architecture}
-\subsection{Logical Architecture}
-\subsection{Class Architecture}
+\subsection{Multi-agent Architecture}
+
+The simulation framework encompasses two different kinds of agents, navigation 
+agents and website agents, as shown in figure \ref{fig:agent_arch}.
 
 \begin{figure}[h]
+    \begin{center}
+        \leavevmode
+        \includegraphics[width=0.95\textwidth]{agent_architecture}
+        \caption{Agent architecture}
+        \label{fig:agent_arch}
+    \end{center}
+\end{figure}
+
+Navigation agents represent users interacting with the website. They have a 
+limited view of the system: they have access to the website (pages and links 
+between them) and they know the current page they are visiting. Each simulation 
+step, the framework asks each navigation agent which action will they pick. The 
+action may be to visit another page (\texttt{BrowseToAction}), exit the 
+website (\texttt{ExitAction}), add a product to the cart 
+(\texttt{AddToCartAction}), finish the purchase (\texttt{CheckoutAction}) 
+or simply do nothing (\texttt{IdleAction}). Also related to the navigation 
+agents subsystem, an implementation of \texttt{NavigationAgentFactory} is 
+used to decide how many navigation agents are added to the system in each step. 
+For example, a simplistic implementation might create a fixed number of 
+navigation agents or a different one closer to reality could follow a Poisson 
+distribution model \cite{gunduz2003poisson}.
+
+% LIMITATION & future work: limited/hardcoded number of actions
+
+Website agents are able to modify the pages before they are served to the 
+users. They have a broader view of the system than navigation agents. They are 
+notified of all the actions that the navigation agents do. The most common use 
+case of the website agents is to recommend products to the users: before the 
+page is served to a user, a website agent can modify a section of the page to 
+display a custom list of products, based on the previous activity of the other 
+users or preferences of the current user. However they are not limited to only 
+recommendations, a website agent might replace a page's content entirely, 
+increase or decrease the price of products (e.g promotions, sales), do nothing, 
+etc.
+
+The framework does not assume how these agents behave however the interactions 
+between them are limited. The agents do not send messages between each other 
+and may only interact indirectly, through the framework (e.g a website agent 
+modifies a page before it is "seen" by a navigation agent). While a simulation 
+run might have hundreds or thousands of navigation agents, to simplify, each 
+run only has one website agent instance (this does not impose a limit on the 
+solution, the agent can still be modelled after a composite agent\footnote{An 
+    agent that represents multiple composite or virtual agents (our name)}).
+
+It is out of the scope of the framework to provide concrete implementations of 
+the agents but we provide 2 implementations of navigation agents and 3 
+implementations of website agents, as a way to validate and verify the 
+simulation runs. This will be further discussed in 
+chapter~\ref{chap:validation}.
+
+\subsection{Simulation Engine}
+
+The simulation engine follows a fairly standard and simple discrete event 
+simulation architecture, as described in \ref{ssec:des}. The domain model we 
+are dealing with allows certain simplifications of the simulation:
+
+\begin{itemize}
+    \item the event list only contains events scheduled for the next step;
+    \item there are no conditional events (type C \cite{pidd1998computer});
+    \item all the events happen instantaneously;
+    \item the events do not depend on other events, they do not require 
+    synchronization and may be implemented in a single-threaded engine.
+\end{itemize}
+
+The process that the simulation engine is described next. In each simulation 
+loop, the engine starts by calling \textproc{newNavigationAgents()} which adds 
+new navigation agents to the simulation. The number and type of these agents 
+are decided by the \texttt{NavigationAgentFactory}. After that, each 
+navigation agent currently active (i.e did not leave the website) chooses an 
+action to do (buy, browse, etc., defined below). Depending on the action that 
+was picked, the engine updates its internal state. The simulation state is 
+represented by \texttt{WebsiteState} and contains statistics and other 
+performance metrics. Whenever the picked action implies presenting the 
+navigation agent a page from the website, the website agent can modify that 
+page before it is presented, by calling \textproc{modifyPage(navAgent, page)}. 
+The website agent is also notified about all actions that the navigation agents 
+do (\textproc{notify(navAgent, action)}). The simulation is configured to end 
+after a fixed number of steps, otherwise it could run forever.
+
+This process is illustrated in figure \ref{fig:sequence_diagram}. 
+
+\begin{figure}[h]
+    \begin{center}
+        \leavevmode
+        \includegraphics[width=0.95\textwidth]{sequence_diagram}
+        \caption{Sequence diagram for the simulation engine}
+        \label{fig:sequence_diagram}
+    \end{center}
+\end{figure}
+
+\subsection{Class Model}
+
+In this sub-section we describe all the classes used to represent all the 
+entities in the simulation engine (figure \ref{fig:class}).
+
+\texttt{Website} represents a website, it contains a set of \texttt{pages} and 
+a reference to its \texttt{homepage}, the entry point of the website. A 
+\texttt{Page} has a set of \texttt{links}, which are all the outbound 
+hyperlinks that a page contains, it has a set of \texttt{tags}, which is used 
+to categorize a page (e.g electronics category, clothing category, cart page, 
+product search page, etc.) and the page may also contain a \texttt{Product}, if 
+the page is a product page. A \texttt{Product} has a \texttt{name}, a 
+\texttt{description} and a \texttt{price}.
+
+The \texttt{Simulation} is an abstract class that contains an \texttt{agenda} 
+which stores all the \texttt{Action}s (an arbitrary function) to be executed in 
+the next steps, it provides a way to enqueue work in the simulation using 
+\textproc{schedule(delay, action)} and a \textproc{run()} method that consumes 
+the \texttt{agenda} until there's no more work to do. A subclass of 
+\texttt{Simulation}, \texttt{WebsiteSimulation} represents a simulation 
+happening over websites. It contains the \texttt{Website} itself, a 
+\texttt{WebsiteState}, a \texttt{NavigationUserFactory} and a 
+\texttt{WebsiteAgent}. The \texttt{WebsiteState} is used to keep track of all 
+the statistics and metrics that the simulation produces. This state can be 
+stored in a database to analyse the results once the simulation is finished.
+
+\texttt{NavigationAgent} is an interface that represents users interacting with 
+the website. Implementations of it have to implement \textproc{emitAction}, 
+which returns the \texttt{Action} the agents wants to do based on their 
+internal state and their current page. These agents are added to the simulation 
+by an implementation of \texttt{NavigationAgentFactory}. \texttt{WebsiteAgent} 
+is an interface that represents the agents that may modify the website and that 
+are notified about all the navigation agent activity.
+
+The mutability of the system is contained to the \texttt{Simulation} (due to 
+its \texttt{agenda}) and \texttt{WebsiteState} which is updated every 
+simulation step.
+
+The points of extensibility of the framework are the agents interfaces 
+(\texttt{NavigationAgent}, \texttt{NavigationAgentFactory} and 
+\texttt{WebsiteAgent}) and \texttt{WebsiteState} (e.g provide additional 
+tracking metrics or visualizations).
+
+\begin{figure}[p]
     \begin{center}
         \leavevmode
         \includegraphics[width=0.95\textwidth]{class_diagram}
@@ -70,7 +205,40 @@ This process can be visualized in figure \ref{fig:sim}.
     \end{center}
 \end{figure}
 
-\subsection{Agent Architecture}
-\subsection{Interface}
+\subsection{Graphical User Interface}
+
+A frontend website has been developed to aid in displaying and visualizing the 
+results of each simulation run. The data is loaded asynchronously from a 
+database which stores \texttt{WebsiteState} snapshots. All the data is rendered 
+to the user server-site except the data required to display charts (e.g Visits 
+per Category chart).
+
+The interface has three distinct views: a simulation list, details about a 
+simulation run and comparison between two simulation runs:
+
+\begin{itemize}
+    \item The simulation list view (\texttt{\textbf{GET} /simulations}) (figure 
+    \ref{fig:sim_view}) displays a table 
+    with all the simulation runs stored in the database. It shows the 
+    identifier, name, agent types and timestamp of each run.
+    \item The detail view (\texttt{\textbf{GET} /simulations/\textit{<id>}}) 
+    (figure \ref{fig:sim_detail_view})
+    display information regarding a single simulation run. This info describes 
+    the simulation and it contains data regarding the types of the agents used, 
+    start and finish time of the simulation, collected metrics (e.g bounce 
+    rate, conversion rate, total order value, etc.), visits per page, visits 
+    per page category, purchases per product and others. This information is 
+    displayed using mostly tables and charts.
+    \item The last view, the comparison page (\texttt{\textbf{GET} 
+    /simulations/compare/\textit{<idA>}/\textit{<idB>}}) (figure 
+    \ref{fig:sim_compare_view}) displays information 
+    regarding two simulation runs (A and B) side by side, so they can be 
+    compared and analysed. The planned use case of this view is to quickly spot 
+    differences between two runs and see how different agent configurations 
+    affect the results.
+\end{itemize}
+
+
+
 
 \section{Technology}
