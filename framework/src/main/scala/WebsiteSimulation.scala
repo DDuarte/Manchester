@@ -36,8 +36,7 @@ class WebsiteSimulation(
                 case browse: BrowseToAction =>
                   val prevPage = page
                   val nextPage = browse.page
-                  state.visitPage(user,
-                                  websiteAgent.modifyPage(nextPage, user))
+                  state.visitPage(user, websiteAgent.modifyPage(nextPage, user))
                 //println(s"User ${user.id} went from page ${prevPage.id} to ${nextPage.id}")
                 case addToCart: AddToCartAction =>
                   state.addToCart(addToCart.product)

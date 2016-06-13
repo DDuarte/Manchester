@@ -43,20 +43,6 @@ class SimulationController @Inject() (simulationRepo: SimulationRepo)
   implicit val system = ActorSystem("Sys")
   implicit val materializer = ActorMaterializer()
 
-  def listSimulationsApi = Action {
-    val simulations = simulationRepo.all
-      .map(p => Json.toJson[List[Simulation]](p))
-      .map(js => ByteString(js.toString()))
-
-    Ok.sendEntity(Streamed(simulations, None, Some(MimeTypes.JSON)))
-  }
-
-  def simulationsApi(id: String) = Action.async {
-    for {
-      Some(simulation) <- simulationRepo.findById(id)
-    } yield Ok(Json.toJson(simulation))
-  }
-
   def simulationsVisitsPerCategoryApi(id: String) = Action.async {
     for {
       Some(simulation) <- simulationRepo.findById(id)
