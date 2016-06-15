@@ -2,7 +2,8 @@ class WebsiteSimulation(
     val website: Website,
     val userFactory: UserFactory[User],
     val websiteAgent: WebsiteAgent,
-    val websiteState: Option[WebsiteState] = None
+    val websiteState: Option[WebsiteState] = None,
+    val steps: Int
 )
     extends Simulation {
 
@@ -14,7 +15,7 @@ class WebsiteSimulation(
   override def run(): Unit = {
     def newUsers() {
       val newUsers = userFactory.users.next()
-      println(s"New users: ${newUsers.length}")
+      //println(s"New users: ${newUsers.length}")
 
       for (user <- newUsers) {
         state.newUser()
@@ -25,7 +26,7 @@ class WebsiteSimulation(
     }
 
     def userInjector() {
-      if (currentTime < 10) {
+      if (currentTime < steps) {
         schedule(1) {
           newUsers()
           state.users.foreach {
@@ -49,8 +50,6 @@ class WebsiteSimulation(
                   state.exit(user)
                 //println(s"User ${user.id} exited")
               }
-
-              sleep(0) // animation purposes
           }
 
           userInjector()
@@ -67,13 +66,5 @@ class WebsiteSimulation(
     while (hasNext) step()
 
     state.finishSimulation()
-
-    def sleep(ms: Int = 50) {
-      try {
-        Thread.sleep(ms)
-      } catch {
-        case _: Throwable =>
-      }
-    }
   }
 }

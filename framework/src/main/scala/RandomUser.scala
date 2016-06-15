@@ -1,11 +1,11 @@
 import breeze.stats.distributions.Rand
 
-case class RandomFactory() extends UserFactory[RandomUser] {
+case class RandomFactory(newUsers: Int) extends UserFactory[RandomUser] {
 
   def getNewUserId: String = java.util.UUID.randomUUID().toString
 
   val users: Iterator[List[RandomUser]] = {
-    Iterator.continually(List.fill(25)(RandomUser(getNewUserId)))
+    Iterator.continually(List.fill(newUsers)(RandomUser(getNewUserId)))
   }
 }
 
