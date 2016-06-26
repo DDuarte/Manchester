@@ -51,24 +51,137 @@ This process can be visualized in figure \ref{fig:sim}.
 
 \section{Requirements}
 
+We have looked at several different e-commerce websites, both national and 
+worldwise, like Amazon\footnote{\url{https://www.amazon.com/}}, 
+eBay\footnote{\url{http://www.ebay.com/}}, 
+PCDIGA\footnote{\url{https://www.pcdiga.com}}, 
+Clickfiel\footnote{\url{http://clickfiel.pt/}}, 
+KuantoKusta\footnote{\url{http://www.kuantokusta.pt/}}, and analysed features 
+and characteristics common to all of them, in order to better assess what the 
+framework should be able to represent and model. To keep things simple and 
+realistically implementable in the given time frame, some limitations had to be 
+done. This section lists the requirements and assumptions of the framework.
+
 \subsection{Website Representation}
+
+\begin{itemize}
+    \item A website is a collection of web pages;
+    \item The common entry point is named homepage but it is possible to enter 
+    the website directly from a different page;
+    \item Structure and navigation between pages is done with links;
+    \item Pages have a purpose like displaying information about a 
+    product, listing multiple products, informing about warranty and payment of 
+    products and services, etc.. We categorize the pages by using tags;
+    \item Product pages have, at least, the product name, its description and 
+    price;
+    \item A virtual shopping cart is used as a staging area for the products 
+    that are going to be bought;
+    \item Checkout is the act of taking all the products in the shopping cart 
+    and effectively buying and paying them;
+    \item Usually, a customer has to create an account and login in the website 
+    in order to buy something or access restricted pages.
+\end{itemize}
+
 \subsection{Navigation Agents}
+
+\begin{itemize}
+    \item Navigation agents represent users or costumers interacting with a 
+    website;
+    \item Some more common interactions are:
+    \begin{itemize}
+        \item jumping from page to page (or browsing);
+        \item exiting the website;
+        \item adding a product to the shopping cart;
+        \item checking out;
+        \item rating a product;
+        \item writing a review or comment;
+        \item bidding on a product;
+        \item filling out forms (login, addresses, bank information, etc.);
+        \item comparing two products side by side.
+    \end{itemize}
+\end{itemize}
+
 \subsection{Website Agents}
+
+\begin{itemize}
+    \item Website agents can modify any page before it is \textit{served} to a 
+    user/costumer;
+    \item Example use cases:
+    \begin{itemize}
+        \item Recommend products to the user based on its preferences or 
+        browsing behaviour;
+        \item Targeted flash sales or promotions;
+        \item A/B testing analysis.
+    \end{itemize}
+\end{itemize}
+
 \subsection{Simulation Engine}
+
+\begin{itemize}
+    \item Given a website, the type of navigation and website agents and 
+    pretended simulation time, the simulation can be started, stopped and store 
+    its state and calculated metrics in a database.
+    \item A simulation run can have thousands of navigation agents entering the 
+    simulation at each step;
+    \item A simulation run can have one or more website agents.
+\end{itemize}
+
 \subsection{Reporting}
+
+\begin{itemize}
+    \item Once a simulation run ends, it can be analysed by taking a look to 
+    its results, metrics and other previously stored characteristics;
+    \item At least two simulation runs can be put side and by side so they can 
+    be quickly compared;
+    \item The calculated metrics should be relevant to the business, some 
+    examples are \cite{Watson2015}:
+    \begin{itemize}
+        \item Bounce rate
+        \item Conversion rate
+        \item Total/average order value
+        \item Average order value
+        \item Items per order
+        \item New visitor conversion rate
+        \item Shopping cart sessions
+        \item Shopping cart conversion rate
+        \item Shopping cart abandonment rate
+        \item Average session length
+        \item Number of browsing sessions
+        \item Page views per session
+        \item Product views per session
+    \end{itemize}
+\end{itemize}
+
+\subsection{Limitations}
+
+Some requirements did not make it to the actual implementation:
+
+\begin{itemize}
+    \item Adding a product to the cart and the checkout is a single step;
+    \item There are no customer accounts, logins, registration, sign ups or 
+    sign ins;
+    \item Visual information about the pages and products is not represented, 
+    e.g., a costumer cannot pick a product to be bought because its associated 
+    picture is appealing;
+    \item It is not possible to remove an item from the cart;
+    \item Interactions with the website are limited and "hard coded" (listed 
+    in sub-section \ref{ssec:multiagents}), not extensible;
+    \item The metrics gathered during the simulation are limited, we have 
+    implemented some of the metrics listed above, non exhaustively.
+\end{itemize}
 
 \section{Architecture}
 
-\subsection{Multi-agent Architecture}
+\subsection{Multi-agent Architecture}\label{ssec:multiagents}
 
 The simulation framework encompasses two different kinds of agents, navigation 
 agents and website agents, as shown in figure \ref{fig:agent_arch}.
 
-\begin{figure}[h]
+\begin{figure}[!h]
     \begin{center}
         \leavevmode
         \includegraphics[width=0.95\textwidth]{agent_architecture}
-        \caption{Agent architecture}
+        \caption{Agent interaction with the environment}
         \label{fig:agent_arch}
     \end{center}
 \end{figure}
@@ -87,11 +200,9 @@ For example, a simplistic implementation might create a fixed number of
 navigation agents or a different one closer to reality could follow a Poisson 
 distribution model \cite{gunduz2003poisson}.
 
-% LIMITATION & future work: limited/hardcoded number of actions
-
 Website agents are able to modify the pages before they are served to the 
 users. They have a broader view of the system than navigation agents. They are 
-notified of all the actions that the navigation agents do. The most common use 
+notified of all the actions that navigation agents do. The most common use 
 case of the website agents is to recommend products to the users: before the 
 page is served to a user, a website agent can modify a section of the page to 
 display a custom list of products, based on the previous activity of the other 
@@ -331,6 +442,34 @@ year).
     \end{tabular}
 \end{table}
 
-\todo{More tests?}
+% \todo{More tests?}
 
 \section{Technology}
+
+Scala\footnote{\url{http://www.scala-lang.org/}} was the language of choice to 
+implement the framework and accompanying projects. Scala is a statically typed, 
+general purpose programming language that leverages both object oriented and 
+functional programming paradigms, while being fully interoperable with the JVM 
+(and Java).
+
+The version of Scala used was 2.11.8 with sbt 
+0.13.11\footnote{\url{http://www.scala-sbt.org/}}, the \textit{de facto} build 
+tool for Scala projects.
+
+The library Breeze (version 
+0.12)\footnote{\url{https://github.com/scalanlp/breeze}} of the 
+ScalaNPL\footnote{\url{http://www.scalanlp.org/}} package was used 
+for numerical processing and statistics.
+
+Apache Spark\texttrademark1.5\footnote{\url{http://spark.apache.org/}} was used 
+to train recommendation models in one of the implementations of website agents. 
+
+GraphStream 1.3\footnote{\url{http://graphstream-project.org/}} was used to 
+visualize websites as a dynamic graph.
+
+To store simulation run results, the database MongoDB 
+3.2.3\footnote{\url{https://www.mongodb.com/}} due to its practicality and 
+rapid development.
+
+The frontend was built with the Play Framework 
+2.5\footnote{\url{https://www.playframework.com/}}.
