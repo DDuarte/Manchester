@@ -79,6 +79,14 @@ lazy val SmallSimulationExample = (project in file("examples/SmallSimulation")).
     )
   ).dependsOn(framework)
 
+lazy val BenchmarkSimulation = (project in file("examples/BenchmarkSimulation")).
+  settings(commonSettings: _*).
+  settings(
+    name := "BenchmarkSimulation",
+    libraryDependencies ++= Seq(
+    )
+  ).dependsOn(framework)
+
 lazy val MongoSimulationExample = (project in file("examples/MongoSimulation")).
   settings(commonSettings: _*).
   settings(
@@ -89,4 +97,4 @@ lazy val MongoSimulationExample = (project in file("examples/MongoSimulation")).
 lazy val root = (project in file(".")).aggregate(
   framework, frontend, KKParser,
   RecommendationMLlib, GephiWebsiteGraph,
-  SmallSimulationExample, MongoSimulationExample)
+  SmallSimulationExample, BenchmarkSimulation, MongoSimulationExample)

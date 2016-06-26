@@ -239,6 +239,96 @@ simulation run and comparison between two simulation runs:
 \end{itemize}
 
 
+\section{Scalability}
 
+To assess the scalability and performance of the simulation engine, some 
+benchmarks were made and they are described next. The tests were ran in a 
+Windows 10 laptop with a Intel\textregistered~Core\texttrademark~i7-4710HQ CPU 
+@ 2.50GHz (8 CPUs) processor. A modified\footnote{Changed each measurement to 
+run the same block of code 10 times, drop the first 2 runs and take the average 
+of the 8 runs instead of running it only once.} version of the library 
+Benchmark.scala\footnote{\url{https://github.com/balagez/Benchmark.scala}} was 
+used, which is based on Ruby's Benchmark 
+module\footnote{\url{http://ruby-doc.org/stdlib-1.9.2/libdoc/benchmark/rdoc/Benchmark.html}}.
+ The focus is not necessarily in the raw speed of the engine but rather in the 
+variation of the simulation time when the number of agents in the system or the 
+number of steps of the simulation are increased.
+
+The test performed consists of running the same simulation with an 
+increasing number of navigation agents and number of simulation steps, set up 
+in the following way:
+
+\begin{itemize}
+    \item \textbf{Website}: Toy sample website with 9 pages and 32 total links 
+    between pages (1 homepage, 1 cart page, 3 product list pages and 4 product 
+    pages);
+    \item \textbf{Website agent}: Dummy agent, does not modify any page;
+    \item \textbf{Navigation agent}: Sample agent implementation which 
+    picks the next action randomly. Configured with a chance of exiting the 
+    website of $\frac{1}{3}$ and a change of adding a product to the cart of 
+    $\frac{1}{20}$;
+    \item \textbf{Number of navigation agents}: From 1000 to 10000 with 
+    increments of 1000;
+    \item \textbf{Number of simulation steps}: From 100 to 1000 with increments 
+    of 100.
+\end{itemize}
+
+The result of the 100 simulation runs is shown in figure \ref{fig:simbench} 
+(whose data is in table \ref{tab:simbench}). A quick analysis shows that the 
+simulation time scales linearly ($\bar{R^{2}} = 0.99149, \sigma = 0.00648$) 
+with both the number of agents and the number of simulation steps. For 
+instance, a simulation with 1000 steps and 10000 navigation agents (entering 
+the system each step)	 took 41.95 seconds. These initial results are very 
+satisfactory however they should be improved, especially when the number of 
+steps is increased, so that simulations that span a longer period of time can 
+be evaluated (e.g simulate the effect of seasonal consumers over an entire 
+year).
+
+\begin{figure}[h]
+    \begin{center}
+        \leavevmode
+        \includegraphics[width=0.95\textwidth]{simulation_benchmark}
+        \caption{Simulation running time for different number of 
+        navigation agents and simulation steps}
+        \label{fig:simbench}
+    \end{center}
+\end{figure}
+
+\begin{table}[h]
+    \centering
+    \caption{Simulation running time (in seconds) for different number of 
+    navigation agents and simulation steps}
+    \label{tab:simbench}
+    \begin{tabular}{@{}lllllllllll@{}}
+        \toprule
+        \diaghead(5, -3){Stepagent}{Steps}{Agents} & 1000 & 2000 & 3000 & 4000 
+        & 5000 
+        & 
+        6000 & 7000 & 8000 & 
+        9000 & 10000 \\ \midrule
+        100 & 0.62 & 0.69 & 1.45 & 1.72 & 1.81 & 2.34 & 2.76 & 3.23 & 3.42 & 
+        4.16 \\
+        200 & 0.67 & 1.43 & 2.20 & 3.17 & 3.84 & 4.49 & 5.22 & 6.30 & 6.93 & 
+        7.89 \\
+        300 & 0.95 & 2.07 & 3.90 & 4.44 & 5.72 & 7.01 & 8.05 & 11.62 & 11.89 & 
+        12.53 \\
+        400 & 1.32 & 2.91 & 4.42 & 5.88 & 7.69 & 9.39 & 12.01 & 12.93 & 14.15 & 
+        16.18 \\
+        500 & 1.58 & 3.48 & 5.34 & 7.49 & 11.03 & 11.44 & 13.65 & 15.77 & 18.20 
+        & 20.00 \\
+        600 & 2.10 & 4.31 & 6.59 & 9.26 & 11.52 & 14.71 & 19.44 & 21.47 & 22.83 
+        & 24.29 \\
+        700 & 2.55 & 5.24 & 7.97 & 11.14 & 13.89 & 18.91 & 18.89 & 22.04 & 
+        26.33 & 33.35 \\
+        800 & 2.56 & 6.10 & 10.46 & 14.48 & 16.31 & 18.56 & 24.49 & 27.52 & 
+        31.19 & 36.26 \\
+        900 & 2.77 & 6.94 & 11.37 & 15.97 & 18.77 & 22.11 & 25.36 & 33.56 & 
+        36.57 & 39.21 \\
+        1000 & 3.07 & 8.47 & 12.64 & 17.40 & 21.59 & 25.62 & 28.94 & 36.46 & 
+        39.40 & 41.95 \\ \bottomrule
+    \end{tabular}
+\end{table}
+
+\todo{More tests?}
 
 \section{Technology}
