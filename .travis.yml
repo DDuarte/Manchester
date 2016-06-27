@@ -16,6 +16,7 @@ addons:
     - texlive-pictures
     - texlive-latex3
     - texlive-science
+    - texlive-full
     - pgf
 
 cache:
