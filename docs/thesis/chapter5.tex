@@ -49,15 +49,50 @@ analysis is in order.
 
 \section{Future Work}
 
+The implementation of the framework should be seen as a foundation for further 
+development. There are certain limitations and assumptions in the developed 
+model that should be resolved in order for the tool be even more useful and 
+usable than it currently is. In no particular order, we list some ideas for the 
+future:
+
+\begin{itemize}
+    \item \textbf{Parallel simulator}. The implemented discrete event simulator 
+    is single threaded and it consumes the events sequentially, which limits 
+    the size of the simulation as seen in section \ref{sec:scalability}. The 
+    implementation could change to a parallel simulator which hopefully 
+    processes more events in the same time frame, taking advantage of 
+    multi-core setups.
+    
+    \item \textbf{More metrics}. We have implemented only a handful of metrics 
+    to be calculated after each simulation run, however, there is a myriad of 
+    other metrics and statistics that we have not looked at. Further 
+    development could increase the pool of available metrics.
+    
+    \item \textbf{Metrics extensibility}. Related to the point above, current 
+    implementation \textit{hardcodes} the calculation of certain metrics in the 
+    framework itself and it is not very practical to extend and add new metrics 
+    to the system. The framework could be modified to ease the process of 
+    adding new metrics, the visitor design pattern\cite{gamma1995design} seems 
+    particularly well suited for this task.
+    
+    \item \textbf{Metrics for website agents}. While there is plenty of metrics 
+    for the navigation agents (i.e users/consumers), metrics for website agents 
+    (i.e recommendation engines) were overlooked and are not present in the 
+    current implementation. It might be useful to gather metrics and statistics 
+    regarding the behaviour of website agents.
+    
+    \item \textbf{Hypothesis testing}. Especially relevant when comparing 2 
+    simulation runs, simply comparing single numeric metrics side by side might 
+    not be the best approach. In the field of statistical hypothesis testing 
+    (e.g A/B testing) there has been plenty of research in which standard tests 
+    to use for each case. For example, to compare conversion rates Fisher's 
+    exact test could be used however to compare the number of products bought a 
+    $\chi^2$ test would be more appropriate \cite{wikiab}.
+\end{itemize}
+
 \todo{http://martinfowler.com/eaaDev/EventSourcing.html \& CQRS}
 
 \todo{take into account visual aspects of the pages}
-
-\todo{parallel simulator}
-
-\todo{more metrics}
-
-\todo{metrics for recommendation agents}
 
 \todo{limited/hardcoded number of actions}
 
