@@ -100,7 +100,8 @@ object Main extends App {
       website,
       AffinityFactory(loadExampleProfiles()),
       DummyWebsiteAgent(),
-      Some(new WebsiteStateVisualization(website))
+      Some(new WebsiteStateVisualization(website)),
+      10
   )
 
   sim.state.display()

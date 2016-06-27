@@ -201,7 +201,7 @@ object Main extends App {
   )
 
   var sim = new WebsiteSimulation(
-      website, AffinityFactory(profiles), DummyWebsiteAgent())
+      website, AffinityFactory(profiles), DummyWebsiteAgent(), None, 10)
 
   Utilities.time("sim run") {
     sim.run()
