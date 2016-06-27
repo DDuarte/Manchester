@@ -19,7 +19,7 @@ abstract class Simulation {
       curTime = agenda.head._1
 
       while (agenda.contains(curTime)) {
-        println("*** time = " + currentTime + " ***")
+        //println("*** time = " + currentTime + " ***")
         val actions = agenda(curTime)
         agenda -= curTime
         processActions(actions)

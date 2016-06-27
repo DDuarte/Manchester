@@ -64,8 +64,25 @@ low \textit{error} rate given the randomness of the system.
     \end{center}
 \end{figure}
 
-\subsection{Second}
+\subsection{Expected number of visits}
 
+This test compares the number of visits (page hits) for a given website and 
+agents setup. The simulation run was configured in the following way:
+
+\begin{itemize}
+    \item \textbf{Website}: Website configured as displayed in figure 
+    \ref{fig:test2website}. The homepage links to 5 product pages and the 
+    product page link to the cart page.
+    \item \textbf{Website agent}: Dummy agent, does not modify any page;
+    \item \textbf{Navigation agent}: The agent picks one linked page randomly 
+    however if current page is for a product, it always buys it. If the current 
+    page is the cart page, it leaves the website;
+    \item \textbf{Number of new navigation agents each step}: 100
+    \item \textbf{Number of simulation steps}: 1000
+\end{itemize}
+
+\begin{figure}
+\centering
 \begin{tikzpicture}
 \SetGraphUnit{3}
 \GraphInit[vstyle=Welsh]
@@ -77,7 +94,7 @@ low \textit{error} rate given the randomness of the system.
 \EA(page4){page5}
 \NO(page3){homepage}
 \SO(page3){cart}
-\tikzset{EdgeStyle/.append style = {<->}}
+\tikzset{EdgeStyle/.append style = {->}}
 \Edge(homepage)(page1)
 \Edge(homepage)(page2)
 \Edge(homepage)(page3)
@@ -89,9 +106,41 @@ low \textit{error} rate given the randomness of the system.
 \Edge(page3)(cart)
 \Edge(page4)(cart)
 \Edge(page5)(cart)
-\tikzset{EdgeStyle/.append style = {->,bend left}}
-\Edge(cart)(homepage)
+% \tikzset{EdgeStyle/.append style = {->,bend left}}
+% \Edge(cart)(homepage)
 \end{tikzpicture}
+\caption{Website graph for the expected visits test} \label{fig:test2website}
+\end{figure}
+
+The table \ref{tab:test2results} displays the expected and observed number of 
+visits for a simulation run as described above. The percent error is calculated 
+and the obtained results are very close to the predicted values.
+
+\begin{table}[]
+    \centering
+    \caption{Expected and observed number of visits}
+    \label{tab:test2results}
+    \begin{tabular}{@{}lllll@{}}
+        \toprule
+        Page     & Observed   & \multicolumn{2}{l}{Expected} & Error  \\ 
+        \midrule
+        homepage & $100000$   & $100 \times 1000$ & $ = 100000$      & $0.00\%$ 
+        \\
+        page1    & $19864$    & $\frac{1}{5} \times 100 \times 1000$ & $ = 
+        20000$ &         $0.68\%$ \\
+        page2    & $20100$    & $\frac{1}{5} \times 100 \times 1000$ & $ = 
+        20000$ &         $0.50\%$ \\
+        page3    & $19696$    & $\frac{1}{5} \times 100 \times 1000$ & $ = 
+        20000$ &         $1.52\%$ \\
+        page4    & $20096$    & $\frac{1}{5} \times 100 \times 1000$ & $ = 
+        20000$ &         $0.48\%$ \\
+        page5    & $20244$    & $\frac{1}{5} \times 100 \times 1000$ & $ = 
+        20000$ &         $1.22\%$ \\
+        cart     & $99900$    & $20000 \times 5$ & $ = 100000$       & $0.10\%$ 
+        \\ 
+        \bottomrule
+    \end{tabular}
+\end{table}
 
 \section{Online store}
 
