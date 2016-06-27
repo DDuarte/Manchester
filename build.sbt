@@ -103,7 +103,16 @@ lazy val ExpectedVisitsSimulationExample = (project in file("examples/ExpectedVi
     )
   ).dependsOn(framework)
 
+lazy val ExpectedBounceRateSimulationExample = (project in file("examples/ExpectedBounceRateSimulation")).
+  settings(commonSettings: _*).
+  settings(
+    name := "ExpectedBounceRateSimulation",
+    libraryDependencies ++= Seq(
+    )
+  ).dependsOn(framework)
+
 lazy val root = (project in file(".")).aggregate(
   framework, frontend, KKParser,
   RecommendationMLlib, GephiWebsiteGraph,
-  SmallSimulationExample, BenchmarkSimulation, MongoSimulationExample, ExpectedVisitsSimulationExample)
+  SmallSimulationExample, BenchmarkSimulation, MongoSimulationExample,
+  ExpectedVisitsSimulationExample, ExpectedBounceRateSimulationExample)

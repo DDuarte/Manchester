@@ -142,6 +142,26 @@ and the obtained results are very close to the predicted values.
     \end{tabular}
 \end{table}
 
+\subsection{Expected bounce rate}
+
+This case compares the bounce rate for a website that only has one page. We 
+define the bounce rate as the percentage of navigation agent sessions that only 
+view a single page before existing the website.
+
+The simulation run was configured in the following way:
+
+\begin{itemize}
+    \item \textbf{Website}: One page only, the homepage;
+    \item \textbf{Website agent}: Dummy agent, does not modify any page;
+    \item \textbf{Navigation agent}: Agent that picks its actions randomly;
+    \item \textbf{Number of new navigation agents each step}: 100
+    \item \textbf{Number of simulation steps}: 1000
+\end{itemize}
+
+As expected, the simulation results yield $100\%$ bounce rate, all of the 
+visits were to the homepage, $10000$ unique users ($100 \times 1000$) and no 
+purchases, as it can be seen on figure \ref{fig:test3result}.
+
 \section{Online store}
 
 \subsection{Input data and configuration}
