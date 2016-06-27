@@ -24,8 +24,8 @@
 %% English version
 
 %% MIEIC options
-\usepackage[mieic]{feupteses}
-%\usepackage[mieic,juri]{feupteses}
+%\usepackage[mieic]{feupteses}
+\usepackage[mieic,juri]{feupteses}
 %\usepackage[mieic,final]{feupteses}
 %\usepackage[mieic,final,onpaper]{feupteses}
 
@@ -111,23 +111,23 @@
 %%Uncomment next line for copyright text if used
 %\copyrightnotice{Name of the Author, 2008}
 
-\supervisor{Supervisor}{Hugo Sereno Ferreira}
+\supervisor{Supervisor}{Hugo Sereno Ferreira, PhD}
 
 %% Uncomment next line if necessary
-\supervisor{Second Supervisor}{João Azevedo}
+\supervisor{Second Supervisor}{João Azevedo, MSc}
 
 %% Uncomment committee stuff in the final version if used
-%\committeetext{Approved in oral examination by the committee:}
-%\committeemember{Chair}{Doctor Name of the President}
-%\committeemember{External Examiner}{Doctor Name of the Examiner}
-%\committeemember{Supervisor}{Doctor Name of the Supervisor}
-%\signature
+\committeetext{Approved in oral examination by the committee:}
+\committeemember{Chair}{}
+\committeemember{External Examiner}{}
+\committeemember{Supervisor}{}
+\signature
 
 %% Specify cover logo (in folder ``figures'')
 \logo{uporto-feup.pdf}
 
 %% Uncomment next line for additional text  below the author's name (front page)
-\additionalfronttext{Working Version}
+% \additionalfronttext{Working Version}
 
 %%----------------------------------------
 %% Preliminary materials
@@ -136,7 +136,7 @@
 % remove unnecssary \include{} commands
 \begin{Prolog}
   \include{abstract_en} % the abstract
-  \include{acknows_en}  % the acknowledgments
+  %\include{acknows_en}  % the acknowledgments
   \include{quote}       % initial quotation if desired
   \cleardoublepage
   \pdfbookmark[0]{Table of Contents}{contents}
@@ -158,6 +158,8 @@
 %% TIP: use a separate file for each chapter
 \include{chapter1} % intro
 \include{chapter2} % literature review
+\include{chapter2b} % literature review
+\include{chapter2c} % literature review
 \include{chapter3} % implementation
 \include{chapter4} % validation
 \include{chapter5} % conclusion & future work
