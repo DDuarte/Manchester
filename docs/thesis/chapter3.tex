@@ -53,10 +53,12 @@ This process can be visualized in figure \ref{fig:sim}.
     \end{center}
 \end{figure}
 
+\todo{why?}
+
 \section{Requirements}
 
-We have looked at several different e-commerce websites, both national and 
-worldwise, like Amazon\footnote{\url{https://www.amazon.com/}}, 
+We have looked at several e-commerce websites, both national and 
+worldwide, like Amazon\footnote{\url{https://www.amazon.com/}}, 
 eBay\footnote{\url{http://www.ebay.com/}}, 
 PCDIGA\footnote{\url{https://www.pcdiga.com}}, 
 Clickfiel\footnote{\url{http://clickfiel.pt/}}, 
@@ -91,7 +93,7 @@ done. This section lists the requirements and assumptions of the framework.
 \begin{itemize}
     \item Navigation agents represent users or costumers interacting with a 
     website;
-    \item Some more common interactions are:
+    \item Some common interactions are:
     \begin{itemize}
         \item jumping from page to page (or browsing);
         \item exiting the website;
@@ -109,7 +111,7 @@ done. This section lists the requirements and assumptions of the framework.
 
 \begin{itemize}
     \item Website agents can modify any page before it is \textit{served} to a 
-    user/costumer;
+    user/customer;
     \item Example use cases:
     \begin{itemize}
         \item Recommend products to the user based on its preferences or 
@@ -133,7 +135,7 @@ done. This section lists the requirements and assumptions of the framework.
 \subsection{Reporting}
 
 \begin{itemize}
-    \item Once a simulation run ends, it can be analysed by taking a look to 
+    \item Once a simulation run ends, it can be analysed by taking a look at 
     its results, metrics and other previously stored characteristics;
     \item At least two simulation runs can be put side and by side so they can 
     be quickly compared;
@@ -161,12 +163,12 @@ done. This section lists the requirements and assumptions of the framework.
 Some requirements did not make it to the actual implementation:
 
 \begin{itemize}
-    \item Adding a product to the cart and the checkout is a single step;
+    \item Adding a product to the cart and the checkout are a single step;
     \item There are no customer accounts, logins, registration, sign ups or 
     sign ins;
     \item Visual information about the pages and products is not represented, 
-    e.g., a costumer cannot pick a product to be bought because its associated 
-    picture is appealing;
+    e.g., a customer cannot pick a product to by because its associated 
+    picture is \textit{appealing};
     \item It is not possible to remove an item from the cart;
     \item Interactions with the website are limited and "hard coded" (listed 
     in sub-section \ref{ssec:multiagents}), not extensible;
@@ -244,12 +246,13 @@ are dealing with allows certain simplifications of the simulation:
     synchronization and may be implemented in a single-threaded engine.
 \end{itemize}
 
-The process that the simulation engine is described next. In each simulation 
+The process that the simulation engine follows is described next. In each 
+simulation 
 loop, the engine starts by calling \textproc{newNavigationAgents()} which adds 
 new navigation agents to the simulation. The number and type of these agents 
 are decided by the \texttt{NavigationAgentFactory}. After that, each 
 navigation agent currently active (i.e did not leave the website) chooses an 
-action to do (buy, browse, etc., defined below). Depending on the action that 
+action to do (buy, browse, etc.). Depending on the action that 
 was picked, the engine updates its internal state. The simulation state is 
 represented by \texttt{WebsiteState} and contains statistics and other 
 performance metrics. Whenever the picked action implies presenting the 
@@ -286,7 +289,7 @@ the page is a product page. A \texttt{Product} has a \texttt{name}, a
 
 The \texttt{Simulation} is an abstract class that contains an \texttt{agenda} 
 which stores all the \texttt{Action}s (an arbitrary function) to be executed in 
-the next steps, it provides a way to enqueue work in the simulation using 
+the next steps. It provides a way to enqueue work in the simulation using 
 \textproc{schedule(delay, action)} and a \textproc{run()} method that consumes 
 the \texttt{agenda} until there's no more work to do. A subclass of 
 \texttt{Simulation}, \texttt{WebsiteSimulation} represents a simulation 
@@ -321,6 +324,8 @@ tracking metrics or visualizations).
         \label{fig:class}
     \end{center}
 \end{figure}
+
+\todo{fix class diag}
 
 \subsection{Graphical User Interface}
 
@@ -398,7 +403,7 @@ instance, a simulation with 1000 steps and 10000 navigation agents (entering
 the system each step)	 took 41.95 seconds. These initial results are very 
 satisfactory however they should be improved, especially when the number of 
 steps is increased, so that simulations that span a longer period of time can 
-be evaluated (e.g simulate the effect of seasonal consumers over an entire 
+be evaluated (e.g simulate the effect of seasonal customers over an entire 
 year).
 
 \begin{figure}[h]
@@ -472,8 +477,8 @@ GraphStream 1.3\footnote{\url{http://graphstream-project.org/}} was used to
 visualize websites as a dynamic graph.
 
 To store simulation run results, the database MongoDB 
-3.2.3\footnote{\url{https://www.mongodb.com/}} due to its practicality and 
-rapid development.
+3.2.3\footnote{\url{https://www.mongodb.com/}} was used due to its practicality 
+and rapid development.
 
 The frontend was built with the Play Framework 
 2.5\footnote{\url{https://www.playframework.com/}}.
