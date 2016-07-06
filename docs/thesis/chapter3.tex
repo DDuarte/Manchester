@@ -305,7 +305,8 @@ which returns the \texttt{Action} the agents wants to do based on their
 internal state and their current page. These agents are added to the simulation 
 by an implementation of \texttt{NavigationAgentFactory}. \texttt{WebsiteAgent} 
 is an interface that represents the agents that may modify the website and that 
-are notified about all the navigation agent activity.
+are notified about all the navigation agent activity. The code for these three 
+interfaces is displayed in listing \ref{src:agentsinterfaces}.
 
 The mutability of the system is contained to the \texttt{Simulation} (due to 
 its \texttt{agenda}) and \texttt{WebsiteState} which is updated every 
@@ -319,13 +320,31 @@ tracking metrics or visualizations).
 \begin{figure}[p]
     \begin{center}
         \leavevmode
-        \includegraphics[width=0.95\textwidth]{class_diagram}
+        \includegraphics[width=1\textwidth]{class_diagram}
         \caption{Class diagram}
         \label{fig:class}
     \end{center}
 \end{figure}
 
 \todo{fix class diag}
+
+\begin{lstlisting}[float,language=Scala, label=src:agentsinterfaces, 
+caption=Definition of the agents interfaces]
+trait NavigationAgentFactory[+T] {
+    def users: Iterator[List[T]]
+}
+
+trait NavigationAgent {
+    def emitAction(currentPage: Page, website: Website): Action
+}
+
+trait WebsiteAgent {
+    def modifyPage(page: Page, user: NavigationAgent): Page
+    def notifyUserAction(user: NavigationAgent, currentPage: Option[Page], 
+                         action: Action)
+}
+
+\end{lstlisting}
 
 \subsection{Graphical User Interface}
 
