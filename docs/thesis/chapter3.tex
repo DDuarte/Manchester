@@ -186,7 +186,7 @@ agents and website agents, as shown in figure \ref{fig:agent_arch}.
 \begin{figure}[!h]
     \begin{center}
         \leavevmode
-        \includegraphics[width=0.95\textwidth]{agent_architecture}
+        \includegraphics[width=1\textwidth]{agent_architecture}
         \caption{Agent interaction with the environment}
         \label{fig:agent_arch}
     \end{center}
@@ -267,7 +267,7 @@ This process is illustrated in figure \ref{fig:sequence_diagram}.
 \begin{figure}[h]
     \begin{center}
         \leavevmode
-        \includegraphics[width=0.95\textwidth]{sequence_diagram}
+        \includegraphics[width=1\textwidth]{sequence_diagram}
         \caption{Sequence diagram for the simulation engine}
         \label{fig:sequence_diagram}
     \end{center}
@@ -308,6 +308,24 @@ is an interface that represents the agents that may modify the website and that
 are notified about all the navigation agent activity. The code for these three 
 interfaces is displayed in listing \ref{src:agentsinterfaces}.
 
+\begin{lstlisting}[float,language=Scala, label=src:agentsinterfaces, 
+caption=Definition of the agents interfaces]
+trait NavigationAgentFactory[+T] {
+def users: Iterator[List[T]]
+}
+
+trait NavigationAgent {
+def emitAction(currentPage: Page, website: Website): Action
+}
+
+trait WebsiteAgent {
+def modifyPage(page: Page, user: NavigationAgent): Page
+def notifyUserAction(user: NavigationAgent, currentPage: Option[Page], 
+action: Action)
+}
+
+\end{lstlisting}
+
 The mutability of the system is contained to the \texttt{Simulation} (due to 
 its \texttt{agenda}) and \texttt{WebsiteState} which is updated every 
 simulation step.
@@ -317,7 +335,7 @@ The points of extensibility of the framework are the agents interfaces
 \texttt{WebsiteAgent}) and \texttt{WebsiteState} (e.g provide additional 
 tracking metrics or visualizations).
 
-\begin{figure}[p]
+\begin{figure}[h]
     \begin{center}
         \leavevmode
         \includegraphics[width=1\textwidth]{class_diagram}
@@ -327,24 +345,6 @@ tracking metrics or visualizations).
 \end{figure}
 
 \todo{fix class diag}
-
-\begin{lstlisting}[float,language=Scala, label=src:agentsinterfaces, 
-caption=Definition of the agents interfaces]
-trait NavigationAgentFactory[+T] {
-    def users: Iterator[List[T]]
-}
-
-trait NavigationAgent {
-    def emitAction(currentPage: Page, website: Website): Action
-}
-
-trait WebsiteAgent {
-    def modifyPage(page: Page, user: NavigationAgent): Page
-    def notifyUserAction(user: NavigationAgent, currentPage: Option[Page], 
-                         action: Action)
-}
-
-\end{lstlisting}
 
 \subsection{Graphical User Interface}
 

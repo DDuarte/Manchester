@@ -58,7 +58,7 @@ low \textit{error} rate given the randomness of the system.
 \begin{figure}[h]
     \begin{center}
         \leavevmode
-        \includegraphics[width=0.95\textwidth]{expected_agents}
+        \includegraphics[width=1\textwidth]{expected_agents}
         \caption{Expected number of agents in the simulation}
         \label{fig:expagents}
     \end{center}
@@ -77,40 +77,41 @@ agents setup. The simulation run was configured in the following way:
     \item \textbf{Navigation agent}: The agent picks one linked page randomly, 
     however, if current page is for a product, it always buys it. If the 
     current page is the cart page, it leaves the website;
-    \todo{algorithm?}
+    % \todo{algorithm?}
     \item \textbf{Number of new navigation agents each step}: 100
     \item \textbf{Number of simulation steps}: 1000
 \end{itemize}
 
 \begin{figure}
-\centering
-\begin{tikzpicture}
-\SetGraphUnit{3}
-\GraphInit[vstyle=Welsh]
-\tikzset{VertexStyle/.append style = { minimum size = 24pt}}
-\Vertex{page3}
-\WE(page3){page2}
-\WE(page2){page1}
-\EA(page3){page4}
-\EA(page4){page5}
-\NO(page3){homepage}
-\SO(page3){cart}
-\tikzset{EdgeStyle/.append style = {->}}
-\Edge(homepage)(page1)
-\Edge(homepage)(page2)
-\Edge(homepage)(page3)
-\Edge(homepage)(page4)
-\Edge(homepage)(page5)
-\tikzset{EdgeStyle/.append style = {->}}
-\Edge(page1)(cart)
-\Edge(page2)(cart)
-\Edge(page3)(cart)
-\Edge(page4)(cart)
-\Edge(page5)(cart)
-% \tikzset{EdgeStyle/.append style = {->,bend left}}
-% \Edge(cart)(homepage)
-\end{tikzpicture}
-\caption{Website graph for the expected visits test} \label{fig:test2website}
+    \centering
+    \begin{tikzpicture}
+        \SetGraphUnit{3}
+        \GraphInit[vstyle=Welsh]
+        \tikzset{VertexStyle/.append style = { minimum size = 24pt}}
+        \Vertex{page3}
+        \WE(page3){page2}
+        \WE(page2){page1}
+        \EA(page3){page4}
+        \EA(page4){page5}
+        \NO(page3){homepage}
+        \SO(page3){cart}
+        \tikzset{EdgeStyle/.append style = {->}}
+        \Edge(homepage)(page1)
+        \Edge(homepage)(page2)
+        \Edge(homepage)(page3)
+        \Edge(homepage)(page4)
+        \Edge(homepage)(page5)
+        \tikzset{EdgeStyle/.append style = {->}}
+        \Edge(page1)(cart)
+        \Edge(page2)(cart)
+        \Edge(page3)(cart)
+        \Edge(page4)(cart)
+        \Edge(page5)(cart)
+        % \tikzset{EdgeStyle/.append style = {->,bend left}}
+        % \Edge(cart)(homepage)
+    \end{tikzpicture}
+    \caption{Website graph for the expected visits test} 
+    \label{fig:test2website}
 \end{figure}
 
 The table \ref{tab:test2results} displays the expected and observed number of 
@@ -166,7 +167,7 @@ purchases, as it can be seen on figure \ref{fig:test3result}.
 \begin{figure}[h]
     \begin{center}
         \leavevmode
-        \includegraphics[width=0.95\textwidth]{expected_bounce_rate}
+        \includegraphics[width=1\textwidth]{expected_bounce_rate}
         \caption{Screenshot of the frontend results for this test run}
         \label{fig:test3result}
     \end{center}
