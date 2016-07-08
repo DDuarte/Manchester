@@ -2,12 +2,17 @@
 
 \section*{}
 
-To validate the framework 3 testbeds were prepared. The first is a collection 
+% To validate the framework 3 testbeds were prepared. The first is a collection 
+% of small fabricated test cases where we compare the output of multiple 
+% simulation runs to the expected results. The second and third cases deal with 
+% real uses of the framework, applied in two different e-commerce contexts: the 
+% first is an online store of computer products and the second is a general 
+% comparison shopping website.
+
+To validate the framework 2 testbeds were prepared. The first is a collection 
 of small fabricated test cases where we compare the output of multiple 
-simulation runs to the expected results. The second and third cases deal with 
-real uses of the framework, applied in two different e-commerce contexts: the 
-first is an online store of computer products and the second is a general 
-comparison shopping website.
+simulation runs to the expected results. The second case deals with a real use 
+of the framework, applied to an online store.
 
 % \section{Validation methodology}
 
@@ -177,16 +182,134 @@ purchases, as it can be seen on figure \ref{fig:test3result}.
 
 \section{Online store}
 
-\todo{...}
+This test case uses data from a real online store that sells electronics and 
+computers products. This website presents a fairly standard online store, 
+mostly consisting of product listing and product pages. There are 3 places 
+where it is possible to recommend products: the homepage has two sections, one 
+with product highlights and another with product promotions and each product 
+page has a tab to show related products.
 
 \subsection{Input data and configuration}
+
+The website consists of 2540 pages with 343201 links between pages, spanning 25 
+base product categories and 103 sub-categories. There are 750 product list 
+pages, 1748 product pages, 1 cart page and 41 uncategorised/generic pages, 
+visualised in figure \ref{fig:cfcategories}.
+
+\begin{figure}[h]
+    \begin{center}
+        \leavevmode
+        \includegraphics[width=1\textwidth]{cf_categories}
+        \caption{Distribution of the type of pages in the website (left) and 
+        distribution of the categories of the products (right)}
+        \label{fig:cfcategories}
+    \end{center}
+\end{figure}
+
+To simulate users and customers (the \texttt{NavigationAgent}s) interacting 
+with this particular website, a model based on affinities was built. This model 
+is composed by the \textit{affinities} themselves (a mapping between product 
+categories and the likelihood of the user liking or having interest on products 
+of that category), the probability of buying a product, the probability of 
+exiting the website and the arrival rate.
+
+Because real usage website data is not available for this website, a sample 
+profile was created with the following properties: the affinities were set up 
+as displayed in table \ref{tab:sample_user}, probability of buying set to 
+$5\%$, probability of leaving the website of $15\%$ and a rate of arrival to 
+the website following a \textit{Poisson} distribution with $\lambda = 500$.
+
+\begin{table}[h]
+    \centering
+    \caption{Affinities for a sample user}
+    \label{tab:sample_user}
+    \begin{tabular}{@{}ll@{}}
+        \toprule
+        \textbf{Category}  & \textbf{Weight}  \\ \midrule
+        Computadores       & 14.29\% \\
+        MSI                & 14.29\% \\
+        Pen Drives         & 7.14\%  \\
+        Portáteis          & 14.29\% \\
+        Intel 2011         & 14.29\% \\
+        Cartões de Memória & 7.14\%  \\
+        Brand              & 14.29\% \\
+        Processadores      & 14.29\% \\ \bottomrule
+    \end{tabular}
+\end{table}
+
 \subsection{Simulation}
+
+The simulation was configured as described in the subsection above. All the 
+navigation agents use the same profile. The "thought" process for each agent is 
+fairly simple: at each step, they try to buy a product and exit the website in 
+accordance to the probabilities defined \textit{a priori} or navigate to a 
+different page based on their categories, with preference as stated by the 
+affinity table. The simulation was run for 30 steps.
+
 \subsection{Results}
 
-\section{Comparison shopping website}
+The results of a sample simulation run are summarized in the tables 
+\ref{tab:visitscat} and \ref{tab:genstats}. They are expected: the number of 
+unique users is 14894 and the expected value is 15000 ($500 \times 25$); the 
+bounce rate is $14.58\%$ and the prior leaving rate is $15\%$; and the 
+conversion rate is $4.77\%$ and the prior buy rate is $5\%$.
 
-\todo{...}
+\begin{table}[h]
+    \centering
+    \caption{Visits per category for a sample simulation run}
+    \label{tab:visitscat}
+    \begin{tabular}{@{}lll@{}}
+        \toprule
+        \textbf{Category}                   & \textbf{Sub-category} & 
+        \textbf{Count} \\ \midrule
+        \multirow{5}{*}{Cartões de Memória} & Pen Drives            & 
+        6492           \\
+        & SD/MiniSD/MicroSD     & 1203           \\
+        & Leitor de Cartões     & 1199           \\
+        & Compact Flash         & 1158           \\
+        & -                     & 37             \\ \midrule
+        \multirow{4}{*}{Portáteis}          & MSI                   & 
+        14326          \\
+        & HP                    & 2623           \\
+        & Asus                  & 2584           \\
+        & -                     & 263            \\ \midrule
+        \multirow{5}{*}{Processadores}      & Intel 2011            & 
+        7097           \\
+        & Intel 1151            & 2752           \\
+        & Intel 1150            & 2379           \\
+        & AMD                   & 2234           \\
+        & -                     & 240            \\ \midrule
+        \multirow{2}{*}{Computadores}       & Brand                 & 
+        19802          \\
+        & -                     & 188            \\ \midrule
+        Motherboards                        & Intel 2011            & 
+        4917           \\ \bottomrule
+    \end{tabular}
+\end{table}
 
-\subsection{Input data and configuration}
-\subsection{Simulation}
-\subsection{Results}
+\begin{table}[h]
+    \centering
+    \caption{Metrics/info regarding a sample simulation run}
+    \label{tab:genstats}
+    \begin{tabular}{@{}ll@{}}
+        \toprule
+        \textbf{Field}  & \textbf{Value}               \\ \midrule
+        Unique users    & 14894                        \\
+        Bounce rate     & 14.58\%                      \\
+        Conversion rate & 4.77\%                       \\
+        Purchases       & 676                          \\
+        NavAgentFactory & AffinityFactory              \\
+        NavAgent        & AffinityUser                 \\
+        WebsiteAgent    & DummyWebsiteAgent            \\
+        Start time      & Thu Jul 07 14:14:36 BST 2016 \\
+        End time        & Thu Jul 07 14:14:39 BST 2016 \\ \bottomrule
+    \end{tabular}
+\end{table}
+
+%\section{Comparison shopping website}
+
+%\todo{...}
+
+%\subsection{Input data and configuration}
+%\subsection{Simulation}
+%\subsection{Results}
