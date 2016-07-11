@@ -25,9 +25,8 @@ case class AffinityUser(id: String, profile: UserProfile) extends User {
       ExitAction()
     else if ((Rand.randInt(101).draw() <= profile.addToCartProb * 100) &&
              currentPage.tags.contains(PageTypesTags.product)) {
-      // assumed that a product page links to a cart page
       val cartPage =
-        currentPage.links.find(l => l.tags.contains(PageTypesTags.cart)).get
+        currentPage.links.find(l => l.tags.contains(PageTypesTags.cart)).getOrElse(currentPage)
       AddToCartAction(currentPage.product.get, cartPage)
     } else {
       val affSelected = RandHelper.choose(profile.affinities).draw()

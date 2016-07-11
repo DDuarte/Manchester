@@ -2,9 +2,9 @@ import java.util.concurrent.TimeUnit
 
 import breeze.stats.distributions.Poisson
 import com.typesafe.config.ConfigFactory
-import org.bson.BsonDocument
+import org.bson.{BsonBoolean, BsonDocument}
 import org.mongodb.scala.{MongoClient, MongoDatabase}
-import org.mongodb.scala.bson.{BsonArray, BsonInt64, _}
+import org.mongodb.scala.bson.{BsonArray, BsonBoolean, BsonInt64, _}
 import org.mongodb.scala.model.Projections._
 import org.mongodb.scala.model.Sorts._
 
@@ -36,10 +36,11 @@ object Main extends App {
                   "productName",
                   "productDescription",
                   "price",
-                  "dynamicCount"
+                  "dynamicCount",
+                  "cart"
               ))
           .sort(ascending("_id"))
-          // .limit(1000)
+          //.limit(5000)
           .results()
           .map { doc =>
         {
@@ -80,23 +81,28 @@ object Main extends App {
                 .getOrElse(BsonString("No description"))
                 .getValue
 
+              //println(doc.get[BsonString]("price").getOrElse(BsonString("0.0 €")))
               val pricePattern = "([0-9]+\\.?,?[0-9]+) ?(.+)".r
-              val pricePattern(price, currency) =
-                doc.get[BsonString]("price").get.getValue
 
-              Some(Product(id,
-                           productName,
-                           productDescription,
-                           price.replace(',', '.').toDouble,
-                           currency))
+              doc.get[BsonString]("price").getOrElse(BsonString("0.0 €")).getValue match {
+                case pricePattern(price, currency) => Some(Product(id,
+                  productName,
+                  productDescription,
+                  price.replace(',', '.').toDouble,
+                  currency))
+                case _ => Some(Product(id,
+                  productName,
+                  productDescription,
+                  0, ""))
+              }
             } else
               None
 
-          /*val optionalCart = doc.get[Boolean]("cart") match {
+          val optionalCart = doc.get[BsonBoolean]("cart").map(v => v.getValue) match {
             case Some(true) => Some(PageTypesTags.cart)
             case Some(false) => None
             case None => None
-          }*/
+          }
 
           val tags: Set[String] =
             doc
@@ -114,7 +120,7 @@ object Main extends App {
             .map(_.asString().getValue)
             .toSet
 
-          id -> (Page(id, MSet(), tags, product), links)
+          id -> (Page(id, MSet(), tags ++ optionalCart, product), links)
         }
       }: _*)
 
@@ -124,7 +130,7 @@ object Main extends App {
         pages.get(l) match {
           case Some(linkPage) => p._1.links += linkPage._1
           case None =>
-            Console.err.println(s"Page ${p._1.id} contains link $l not found")
+            // Console.err.println(s"Page ${p._1.id} contains link $l not found")
         }
       })
     })
@@ -181,7 +187,7 @@ object Main extends App {
               affinities,
               pageWeights,
               duration,
-              Poisson(250),
+              Poisson(500),
               0.05,
               0.15 /* TODO: hardcoded */ ) -> 1.0 /* TODO: hardcoded */
         }
@@ -201,7 +207,7 @@ object Main extends App {
   )
 
   var sim = new WebsiteSimulation(
-      website, AffinityFactory(profiles), DummyWebsiteAgent(), None, 10)
+      website, AffinityFactory(profiles), DummyWebsiteAgent(), None, 30)
 
   Utilities.time("sim run") {
     sim.run()
